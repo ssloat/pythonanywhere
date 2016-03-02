@@ -45,14 +45,11 @@ class VanguardFund(db.Model):
         logger.info('parse_overview: %s' % self.overview_url)
 
         table = _web_lookup(self.overview_url, driver, "//table[@id='fundFactsTable']/tbody")[0]
-        print "table: %s" % table
 
         trs = [
             x for x in table.find_elements(By.TAG_NAME, 'tr')
             if len(x.find_elements(By.TAG_NAME, 'td')) > 1
         ]
-
-        print trs
 
         self.category = trs[1].find_elements(By.TAG_NAME, 'td')[1].text
         minimum = trs[3].find_elements(By.TAG_NAME, 'td')[1].text.lower()
