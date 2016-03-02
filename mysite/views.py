@@ -1,5 +1,5 @@
 from . import app, db
-from mysite.models import User
+from mysite.models.user import User
 
 from flask import render_template, redirect, url_for
 from flask.ext.login import login_user, logout_user, current_user
