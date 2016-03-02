@@ -1,3 +1,4 @@
+sync_*sh
 run.py
 config.py
 db_create.py
