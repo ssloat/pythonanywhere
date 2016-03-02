@@ -51,11 +51,11 @@ class DailyExtract:
             display.start()
 
             driver = webdriver.Firefox()
+            driver.implicitly_wait(3)
             funds = extract_funds(driver)
 
             for fund in funds:
                 logging.info('Processing %d' % fund.id)
-                sleep = False
                 for _ in range(2):
                     try:
                         in_db = db.session.query(VanguardFund).filter(
@@ -68,18 +68,16 @@ class DailyExtract:
                                 break
 
                             db.session.add(fund)
-                            sleep = True
 
-                        sleep = sleep or self.process_data(fund, driver)
+                        self.process_data(fund, driver)
 
                         break
 
                     except selenium.common.exceptions.StaleElementReferenceException as e:
                         logging.warn( "stale record: %s" % e )
 
-                    db.session.commit()
-                    if sleep:
-                        time.sleep(5)
+                db.session.commit()
+                time.sleep(5)
 
         finally:
             if driver:
