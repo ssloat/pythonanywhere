@@ -67,19 +67,19 @@ def vanguard_funds():
 
     return jsonify({'funds': resp})
 
-@app.route('/rest/vanguard/v1.0/prices/<fund_id>', methods=['GET'])
-def vanguard_prices(fund_id):
+@app.route('/rest/vanguard/v1.0/prices/<ticker>', methods=['GET'])
+def vanguard_prices(ticker):
     resp = [
         { 'date': x.date.strftime('%Y-%m-%d'), 'price': x.price }
-        for x in db.session.query(VanguardPrice).filter(
-            VanguardPrice.fund_id==fund_id
-        ).all()
+        for x in db.session.query(VanguardFund).filter(
+            VanguardFund.ticker==ticker
+        ).first().prices
     ]
 
     return jsonify({'prices': resp})
 
-@app.route('/rest/vanguard/v1.0/dividends/<fund_id>', methods=['GET'])
-def vanguard_dividends(fund_id):
+@app.route('/rest/vanguard/v1.0/dividends/<ticker>', methods=['GET'])
+def vanguard_dividends(ticker):
     resp = [
         { 
             'dividend_type': x.dividend_type,
@@ -89,9 +89,9 @@ def vanguard_dividends(fund_id):
             'reinvest_date': x.reinvest_date.strftime('%Y-%m-%d'),
             'reinvest_price': x.reinvest_price,
         }
-        for x in db.session.query(VanguardDividend).filter(
-            VanguardPrice.fund_id==fund_id
-        ).all()
+        for x in db.session.query(VanguardFund).filter(
+            VanguardFund.ticker==ticker
+        ).first().dividends
     ]
 
     return jsonify({'dividends': resp})
