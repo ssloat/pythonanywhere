@@ -5,3 +5,5 @@ db_create.py
 app.db
 *.pyc
 *.swp
+vanguard
+user
