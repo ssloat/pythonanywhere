@@ -44,7 +44,12 @@ class VanguardFund(db.Model):
     def parse_overview(self, driver):
         logger.info('parse_overview: %s' % self.overview_url)
 
-        table = _web_lookup(self.overview_url, driver, "//table[@id='fundFactsTable']/tbody")[0]
+        (table,) = _web_lookup(
+            self.overview_url, 
+            driver, 
+            "//table[@id='fundFactsTable']/tbody",
+        )
+        logger.info(table)
 
         trs = [
             x for x in table.find_elements(By.TAG_NAME, 'tr')
@@ -52,7 +57,9 @@ class VanguardFund(db.Model):
         ]
 
         self.category = trs[1].find_elements(By.TAG_NAME, 'td')[1].text
+        logger.info('category: %s' % self.category)
         minimum = trs[3].find_elements(By.TAG_NAME, 'td')[1].text.lower()
+        logger.info('minimum: %s' % self.minimum)
         self.minimum = minimum if minimum == 'closed' else _to_float(minimum)
 
     @property
@@ -186,6 +193,7 @@ def _web_lookup(url, driver, *items):
             if attempt > 1:
                 logger.info("download attempt %d" % attempt)
 
+            logger.info("download attempt %d: %s" % (attempt, url))
             driver.get(url)
             return [driver.find_element_by_xpath(x) for x in items]
 
@@ -224,7 +232,7 @@ class VanguardDividend(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     fund_id = db.Column(db.Integer, db.ForeignKey('vanguard_funds.id'))
-    dividend_type = db.Column(db.String, nullable=False)
+    dividend_type = db.Column(db.String(64), nullable=False)
     price_per_share = db.Column(db.Float, nullable=False)
     payable_date = db.Column(db.Date, nullable=False)
     record_date = db.Column(db.Date, nullable=False)
@@ -260,7 +268,7 @@ class VanguardFee(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     fund_id = db.Column(db.Integer, db.ForeignKey('vanguard_funds.id'))
-    fee_type = db.Column(db.String, nullable=False)
+    fee_type = db.Column(db.String(64), nullable=False)
     fee = db.Column(db.Float, nullable=False)
 
     def __init__(self, fund, fee_type, fee):
