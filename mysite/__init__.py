@@ -11,6 +11,7 @@ lm = LoginManager()
 lm.init_app(app)
 lm.login_view = 'login'
 
+import mysite.views
 import mysite.vanguard.models
 import mysite.vanguard.views
 import mysite.user.models
