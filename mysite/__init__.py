@@ -16,3 +16,5 @@ import mysite.vanguard.models
 import mysite.vanguard.views
 import mysite.user.models
 import mysite.user.views
+import mysite.stocks.models
+import mysite.stocks.views
