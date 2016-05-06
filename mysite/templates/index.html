@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block navbar_home %} class="active" {% endblock %}
 {% block mainpane %}
   {% if current_user.is_authenticated %}
     <h2>Hi, {{ current_user.name }}!</h2>
