@@ -2,8 +2,14 @@ sync_*sh
 run.py
 db_create.py
 app.db
+config.py
 *.pyc
 *.swp
-vanguard
-user
-stocks
+mysite/budget
+mysite/static/budget
+mysite/templates/budget
+mysite/user
+mysite/templates/user
+mysite/vanguard
+mysite/user
+mysite/stocks
