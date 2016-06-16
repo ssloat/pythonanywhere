@@ -1,6 +1,5 @@
 sync_*sh
 run.py
-db_create.py
 app.db
 config.py
 *.pyc
