@@ -4,11 +4,3 @@ app.db
 config.py
 *.pyc
 *.swp
-mysite/budget
-mysite/static/budget
-mysite/templates/budget
-mysite/user
-mysite/templates/user
-mysite/vanguard
-mysite/user
-mysite/stocks

@@ -11,10 +11,6 @@ lm.login_view = 'user.login'
 def create_app(obj=None):
     import user.models
     import user.views
-    import investments.vanguard.models
-    import investments.vanguard.views
-    import investments.stocks.models
-    import investments.stocks.views
     import investments.assets.models
     import investments.assets.views
     import investments.portfolio.models
@@ -44,9 +40,7 @@ def create_app(obj=None):
 
     app.register_blueprint(finances.budget.views.budget_bp)
     app.register_blueprint(finances.transaction.views.transaction_bp)
-    app.register_blueprint(investments.vanguard.views.vanguard_bp)
     app.register_blueprint(investments.portfolio.views.portfolio_bp)
-    #app.register_blueprint(investments.stocks.views.stock_bp)
     app.register_blueprint(user.views.user_bp)
 
     Bootstrap(app)
