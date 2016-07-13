@@ -1,3 +1,4 @@
+config.py
 sync_*sh
 run.py
 app.db
