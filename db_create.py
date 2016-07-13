@@ -4,7 +4,7 @@ from mysite import db
 
 from flask import Flask
 
-import user.models
+import mysite.user.models
 import investments.assets.models
 import investments.portfolio.models
 import finances.budget.models

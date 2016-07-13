@@ -1,7 +1,7 @@
 from mysite import db
 
-from user.models import User, ProviderId
-from user.oauth import OAuthSignIn
+from mysite.user.models import User, ProviderId
+from mysite.user.oauth import OAuthSignIn
 
 from flask import Blueprint, render_template, redirect, url_for 
 from flask.ext.login import login_user, logout_user, current_user

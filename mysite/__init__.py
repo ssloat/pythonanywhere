@@ -9,8 +9,8 @@ lm = LoginManager()
 lm.login_view = 'user.login'
 
 def create_app(obj=None):
-    import user.models
-    import user.views
+    import mysite.user.models
+    import mysite.user.views
     import investments.assets.models
     import investments.assets.views
     import investments.portfolio.models
@@ -31,9 +31,6 @@ def create_app(obj=None):
     def about():
         return render_template('about.html')
 
-    @app.route('/test')
-    def test():
-        return render_template('test.html')
 
     db.init_app(app)
     lm.init_app(app)
@@ -41,7 +38,7 @@ def create_app(obj=None):
     app.register_blueprint(finances.budget.views.budget_bp)
     app.register_blueprint(finances.transaction.views.transaction_bp)
     app.register_blueprint(investments.portfolio.views.portfolio_bp)
-    app.register_blueprint(user.views.user_bp)
+    app.register_blueprint(mysite.user.views.user_bp)
 
     Bootstrap(app)
 
