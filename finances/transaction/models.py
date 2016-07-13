@@ -3,10 +3,10 @@ from mysite import db
 class Transaction(db.Model):
     __tablename__ = 'finances_transactions'
 
-    id = db.Column(db.String, primary_key=True)
+    id = db.Column(db.String(64), primary_key=True)
     tdate = db.Column(db.Date)
     category_id = db.Column(db.Integer, db.ForeignKey('finances_categories.id'))
-    name = db.Column(db.String)
+    name = db.Column(db.String(64))
     amount = db.Column(db.Float)
     bdate = db.Column(db.Date)
     yearly = db.Column(db.Boolean, default=False)
@@ -37,7 +37,7 @@ class Category(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('finances_categories.id'))
-    name = db.Column(db.String)
+    name = db.Column(db.String(64))
     depth = db.Column(db.Integer, default=0)
 
     children = db.relationship("Category", 
@@ -77,7 +77,7 @@ class CategoryRE(db.Model):
     __tablename__ = 'finances_category_res'
 
     id = db.Column(db.Integer, primary_key=True)
-    pattern = db.Column(db.String)
+    pattern = db.Column(db.String(64))
     minimum = db.Column(db.Float, nullable=True)
     maximum = db.Column(db.Float, nullable=True)
 
@@ -95,7 +95,7 @@ class Action(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     categoryre_id = db.Column(db.Integer, db.ForeignKey('finances_category_res.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('finances_categories.id'))
-    name = db.Column(db.String)
+    name = db.Column(db.String(64))
     yearly = db.Column(db.Boolean, default=False)
 
     category = db.relationship("Category")
