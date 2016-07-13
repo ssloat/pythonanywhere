@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block styles %}
+  {{super()}}
+  <link rel="stylesheet" type="text/css" href="{{url_for('transaction.static', filename='css/themes/icon.css')}}">
+  <link rel="stylesheet" type="text/css" href="{{url_for('transaction.static', filename='css/themes/bootstrap/tree.css')}}">
+{% endblock %}
+
+{% block scripts %}
+  {{super()}}
+  <script src={{url_for('transaction.static', filename='js/jquery.easyui.min.js')}}></script>
+  <script>
+    $("#tt").tree({
+      url: "{{url_for('transaction.rest_categories')}}",
+      method: 'GET',
+      dnd: 'true',
+      animate: 'true',
+      loadFilter: function(data) {
+        console.log(data);
+        if (data.tree) {
+          return data.tree;
+        }
+        else {
+          return data;
+        }
+      },
+      onDrop: function(target, source, point) {
+        var target_id = $('#tt').tree('getNode', target).id;
+        $.post("{{url_for('transaction.rest_modify_category')}}",
+            {
+                'id': source.id,
+                'parent_id': target_id,
+            }
+        );
+      },
+    });
+  </script>
+{% endblock %}
+
+{% block mainpane %}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-3"> 
+        <ul id="tt" class="easyui-tree" data-options="animate:true"> </ul>
+        {{ wtf.quick_form(form) }}
+      </div>
+      <div class="col-md-9"> </div>
+    </div>
+  </div>
+
+{% endblock %}

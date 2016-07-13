@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block navbar_budget %} class="active" {% endblock %}
+{% block scripts %}
+  {{super()}}
+  <script src={{url_for('budget.static', filename='js/budget.js')}}></script>
+  <script>
+$(document).ready(function(){
+    $.get("{{url_for('budget.rest_budget', budget_id=budget_id)}}", function(data, status){ 
+        buildTables(data, {{ budget_id }}); 
+        $("body > h1").text(data['name']);
+    });
+
+    $("form input[name='add_item']").click(function(){
+        $.post("{{url_for('budget.rest_add_item', budget_id=budget_id)}}", 
+            {
+                'category': $("form input[name='category']").val(),
+                'name': $("form input[name='name']").val(),
+                'monthly': $("form input[name='monthly']").val(),
+                'yearly': $("form input[name='yearly']").val(),
+            },
+            function(data, status) { buildTables(data, {{ budget_id }}); }
+        );
+    });
+
+});
+  </script>
+{% endblock %}
+
+{% block mainpane %}
+  <div class="container-fluid">
+    <form role="form"> 
+      <div class="form-group">
+        <div class="col-xs-2">
+          <label for="ex1">Category</label>
+          <input class="form-control" id="ex1" type="text" name="category">
+        </div>
+        <div class="col-xs-2">
+          <label for="ex2">Name</label>
+          <input class="form-control" id="ex2" type="text" name="name">
+        </div>
+        <div class="col-xs-2">
+          <label for="ex3">Monthly*12</label>
+          <input class="form-control" id="ex3" type="text" name="monthly">
+        </div>
+        <div class="col-xs-2">
+          <label for="ex4">Yearly</label>
+          <input class="form-control" id="ex4" type="text" name="yearly">
+        </div>
+        <div class="col-xs-1">
+          <label for="add_item">&nbsp</label>
+          <input class="btn btn-default" name="add_item" value="add">
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+  <div class="container-fluid">
+    <table class="table table-hover" id='budget'>
+      <thead> 
+        <tr> 
+          <th>Name</th> 
+          <th>Monthly</th> 
+          <th>Monthly*12</th> 
+          <th>Yearly</th> 
+          <th>Total</th> 
+          <th/>
+        </tr> 
+      </thead>
+      <tbody> </tbody>
+    </table>
+  </div>
+{% endblock %}

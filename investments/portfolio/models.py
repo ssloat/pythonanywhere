@@ -2,6 +2,8 @@ from mysite import db
 
 from investments.assets.models import Asset, AssetPrice
 import datetime
+import itertools
+import collections
 
 class Portfolio(db.Model):
     __tablename__ = 'portfolios'
@@ -36,6 +38,76 @@ class Portfolio(db.Model):
 
         return results
 
+    def costs(self, date):
+        positions = [
+            p for p in self.positions 
+            if p.date <= date and p.action.lower() in ['buy', 'xfer']
+        ]
+        
+        results = collections.defaultdict(float)
+        for p in positions:
+            results[p.asset.ticker] += p.cost
+
+        return results
+
+
+    def dates(self, start, end):
+        dates = itertools.chain(*[
+            [p.date for p in pos.asset.prices if p.date >= start and p.date <= end]
+            for pos in self.positions
+        ])
+        return sorted(set(dates))
+
+    def table(self, start, end):
+        tickers = sorted(set([p.asset.ticker for p in self.positions]))
+        totals_table = [['Date', 'Total'] + [t for t in tickers]]
+        for d in self.dates(start, end):
+            values = self.values(d)
+            row = [values.get(t, 0.0) for t in tickers]
+            totals_table.append([d, sum(row)] + row)
+
+        return totals_table
+
+    def table_categories(self, start, end):
+        mapper = {
+            'SP500': ['VFINX', 'VOO', 'VIIIX'],
+            'SmallCap': ['LMBMX'],
+            'Intl': ['OSMAX', 'TFEQX'],
+            'REIT': ['VGSIX', 'VNQ', 'REZ'],
+            'Bonds': ['BA', 'WACSX'],
+            'Stock': ['BAC', 'AAPL', 'HD', 'AMZN'],
+            'Health': ['AET', 'VHT'],
+            'Energy': ['VDE', 'VGPMX'],
+        }
+
+        cats = sorted(mapper.keys())
+        values_table = [['Date', 'Total'] + cats]
+        returns_table = [['Date', 'Total'] + cats]
+        for d in self.dates(start, end):
+            values = self.values(d)
+            costs = self.costs(d)
+            values_row = [
+                sum([values.get(t, 0.0) for t in mapper[cat]])
+                for cat in cats
+            ]
+            values_row = [sum(values_row)] + values_row
+
+            cost_row = [
+                sum([costs.get(t, 0.0) for t in mapper[cat]])
+                for cat in cats
+            ]
+            cost_row = [sum(cost_row)] + cost_row
+
+            values_table.append([d] + values_row)
+            returns_table.append([d] + [
+                (0 if cost==0 else (value-cost)/cost) 
+                for cost, value in zip(cost_row, values_row)
+            ])
+
+
+        return values_table, returns_table
+
+
 
 class Position(db.Model):
     __tablename__ = 'positions'
@@ -66,9 +138,18 @@ class Position(db.Model):
         self.shares = shares
         self.price = price
 
+    def change(self, date):
+        dividends = sum([
+            x.value for x in self.asset.dividends 
+            if x.date >= self.date and x.date <= date
+        ], 0.0)
+
+        value = self.shares * (self.asset.price(date) + dividends)
+        return (value - self.cost) / self.cost
+
     def __repr__(self):
         return "<Position(%s, %s, '%s' %f, %f, %f)>" % (
-            self.date, self.asset, self.action, self.cost, self.shares, self.price
+            self.date, self.asset.ticker, self.action, self.cost, self.shares, self.price
         )
 
 def portfolio(start, end):

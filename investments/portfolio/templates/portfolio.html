@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% macro jdate(date) -%}new Date({{ date.year }}, {{date.month-1}}, {{date.day}}){%- endmacro %}
+
+{% block scripts %}
+  {{super()}}
+    <!--Load the AJAX API-->
+    <!--<script type="text/javascript" src="https://www.google.com/jsapi"></script>-->
+    <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+    <script type="text/javascript">
+      //google.load('visualization', '1.1', {'packages':['line']});
+      google.charts.load('current', {'packages':['annotationchart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Date');
+        {% for i in range(returns[0]|length-1) %} 
+        data.addColumn('number', '{{returns[0][i+1]}}'); 
+        {% endfor %}
+        data.addRows([
+            {% for row in returns[1:] %}
+            [{{jdate(row[0])}}{% for i in range(row|length-1) %}, {{ row[i+1] }} {% endfor %}],
+            {% endfor %}
+        ]);
+
+        // Set chart options
+        var options = { 'width':1200, 'height':500 };
+
+        // Instantiate and draw our chart, passing in some options.
+        //var chart = new google.charts.Line(document.getElementById('linechart_div'));
+        var chart = new google.visualization.AnnotationChart(document.getElementById('linechart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+{% endblock %}
+
+{% block mainpane %}
+  <div id="linechart_div"></div>
+  <table class="table table-striped">
+    {% for row in values %}
+    <tr>
+      {% for elem in row %}<td>{{elem|money}}</td>{% endfor %}
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
