@@ -1,6 +1,7 @@
 from mysite import db, lm
 
 from flask.ext.login import UserMixin
+from sqlalchemy.ext.declarative import declared_attr
 
 
 class User(UserMixin, db.Model):
@@ -21,6 +22,22 @@ class ProviderId(db.Model):
     def __init__(self, id, user):
         self.id = id
         self.user = user
+
+class AddUser(object):
+    
+    @declared_attr
+    def user_id(cls):
+        return db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    @declared_attr
+    def user(cls):
+        return db.relationship('User')
+
+    def __init__(self, user):
+        if isinstance(user, int):
+            self.user_id = user
+        else:
+            self.user = user
 
 
 @lm.user_loader

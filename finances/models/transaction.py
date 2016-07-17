@@ -1,13 +1,15 @@
 from mysite import db
+from mysite.user.models import AddUser
 
-class Record(db.Model):
+class Record(db.Model, AddUser):
     __tablename__ = 'finance_transaction_records'
 
     id = db.Column(db.String(128), primary_key=True)
     date = db.Column(db.Date)
     payee = db.Column(db.String(128))
 
-class Transaction(db.Model):
+
+class Transaction(db.Model, AddUser):
     __tablename__ = 'finance_transactions'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -21,7 +23,9 @@ class Transaction(db.Model):
     record = db.relationship("Record", backref='records')
     category = db.relationship("Category")
 
-    def __init__(self, date, name, category, amount, record_id=None, yearly=False):
+    def __init__(self, user, date, name, category, amount, record_id=None, yearly=False):
+        AddUser.__init__(self, user)
+
         self.date = date
         self.name = name
         self.amount = amount

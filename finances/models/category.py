@@ -1,7 +1,8 @@
 from mysite import db
 
+from mysite.user.models import AddUser
 
-class Category(db.Model):
+class Category(db.Model, AddUser):
     __tablename__ = 'finance_categories'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -13,8 +14,10 @@ class Category(db.Model):
         backref=db.backref('parent', remote_side=[id])
     )
 
-    def __init__(self, name, parent=None, depth=0):
+    def __init__(self, user, name, parent=None, depth=0):
+        AddUser.__init__(self, user)
         self.name   = name
+
         if parent:
             self.parent = parent
             self.depth  = parent.depth + 1
@@ -45,7 +48,7 @@ def categoriesSelectBox(cat=None):
 
     return results
  
-class CategoryRE(db.Model):
+class CategoryRE(db.Model, AddUser):
     __tablename__ = 'finance_category_res'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -55,7 +58,9 @@ class CategoryRE(db.Model):
 
     actions = db.relationship("Action")
 
-    def __init__(self, pattern, minimum=None, maximum=None):
+    def __init__(self, user, pattern, minimum=None, maximum=None):
+        AddUser.__init__(self, user)
+
         self.pattern = pattern
         self.minimum = minimum
         self.maximum = maximum
@@ -63,7 +68,7 @@ class CategoryRE(db.Model):
     def __repr__(self):
        return "<CategoryRE('%s')>" % (self.pattern)
 
-class Action(db.Model):
+class Action(db.Model, AddUser):
     __tablename__ = 'finance_actions'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -76,6 +81,8 @@ class Action(db.Model):
     category = db.relationship("Category")
 
     def __init__(self, name, categoryre, category, yearly=False, fixed=None):
+        AddUser.__init__(self, user)
+
         self.name = name
         self.yearly = yearly
         self.fixed = fixed
