@@ -1,7 +1,7 @@
 from flask.ext.wtf import Form
 from wtforms import TextField, SelectField, SubmitField
 
-from finances.transaction.models import Category
+from finances.models.category import Category
 from mysite import db
 
 class NewCategoryForm(Form):

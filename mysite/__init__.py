@@ -9,15 +9,10 @@ lm = LoginManager()
 lm.login_view = 'user.login'
 
 def create_app(obj=None):
-    import mysite.user.models
     import mysite.user.views
-    import investments.assets.models
     import investments.assets.views
-    import investments.portfolio.models
     import investments.portfolio.views
-    import finances.budget.models
     import finances.budget.views
-    import finances.transaction.models
     import finances.transaction.views
 
     app = Flask(__name__)

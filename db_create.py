@@ -8,7 +8,8 @@ import mysite.user.models
 import investments.assets.models
 import investments.portfolio.models
 import finances.budget.models
-import finances.transaction.models
+import finances.models.transaction
+import finances.models.category
 
 app = Flask(__name__)
 app.config.from_object('config')

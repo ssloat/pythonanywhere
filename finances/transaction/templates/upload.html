@@ -11,10 +11,9 @@
     <thead><tr>
       <th>date</th>
       <th>name</th>
-      <th>category_id</th>
       <th>category</th>
       <th>amount</th>
-      <th>payee</th>
+      <th>yearly</th>
       <th>id</th>
     </tr></thead>
     <tbody></tbody>
@@ -40,11 +39,13 @@ $(document).ready(function(){
             var row = $("<tr></tr>");
             $(row).append( $("<td></td>").text(trans[i]['date']) );
             $(row).append( $("<td></td>").text(trans[i]['name']) );
-            $(row).append( $("<td></td>").text(trans[i]['category_id']) );
-            //var select = $("<select name='category' class='form-control></select>");
             var select = $("<select></select").attr({name: 'category', class: 'form-control'});
             {% for category in categories %}
-              $(select).append( $("<option></option>").attr('value', '{{category[0]}}').text("{{category[1]}}") );
+              $(select).append( 
+                $("<option></option>")
+                  .attr('value', '{{category[0]}}')
+                  .text("{{category[1]|safe}}") 
+              );
             {% endfor %}
             $(select).children().each(function(){
               if ($(this).attr('value') == trans[i]['category_id']) {
@@ -53,7 +54,11 @@ $(document).ready(function(){
             });
             $(row).append( $("<td></td>").append(select) );
             $(row).append( $("<td></td>").text(trans[i]['amount']) );
-            $(row).append( $("<td></td>").text(trans[i]['payee']) );
+            var check = $("<input></input>").attr('type', 'checkbox');
+            if (trans[i]['yearly'] == '1') {
+                $(check).attr('checked', true)
+            }
+            $(row).append( $("<td></td>").append(check) );
             $(row).append( $("<td></td>").text(trans[i]['id']) );
 
             $("table#output tbody").append(row);
