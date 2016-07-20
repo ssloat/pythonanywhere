@@ -3,6 +3,7 @@
 
 {% block scripts %}
   {{super()}}
+    <link rel="stylesheet" href="/static/portfolio/css/scrollable_table.css">
     <!--Load the AJAX API-->
     <!--<script type="text/javascript" src="https://www.google.com/jsapi"></script>-->
     <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
@@ -31,16 +32,25 @@
         var chart = new google.visualization.AnnotationChart(document.getElementById('linechart_div'));
         chart.draw(data, options);
       }
+
+      $("table th, table td").each(function(i, elem) {
+        $(elem).attr("width", "{{ 100.0 / values[0]|length}}%");
+      });
     </script>
 {% endblock %}
 
 {% block mainpane %}
   <div id="linechart_div"></div>
   <table class="table table-striped">
-    {% for row in values %}
+    <thead>
+      <tr> {% for elem in values[0] %}<th>{{elem}}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+    {% for row in values[1:] %}
     <tr>
       {% for elem in row %}<td>{{elem|money}}</td>{% endfor %}
     </tr>
     {% endfor %}
+    </tbody>
   </table>
 {% endblock %}

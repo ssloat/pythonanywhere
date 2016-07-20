@@ -6,7 +6,7 @@ import math
 import itertools
 from dateutil.relativedelta import relativedelta
 
-from investments.models.portfolio import Portfolio, Position
+from investments.models.portfolio import PortfolioGroup, Portfolio, Position
 from investments.models.assets import Asset
 from mysite import db
 
@@ -24,6 +24,23 @@ def money_filter(s):
     return "{:,.2f}".format(s) if isinstance(s, (int, float)) else s
 
  
+@portfolio_bp.route('/portfolio_group/<int:portfolio_id>/<start>')
+def portfolio_group(portfolio_id, start):
+    start = datetime.date(*map(int, start.split('-')))
+    pg = db.session.query(PortfolioGroup).filter(PortfolioGroup.id==portfolio_id).first()
+    #if p.user_id != current_user.id:
+    #    return redirect(url_for('user.access_denied'))
+
+    dates = sorted(set(sum([p.dates(start) for p in pg.portfolios], [])))
+
+    headings = [(p.id, p.name) for p in pg.portfolios]
+    results = [[d] + [p.value(d) for p in pg.portfolios] for d in dates]
+
+    for row in results:
+        row.append(sum(row[1:]))
+
+    return render_template('portfolio_group.html', results=results, headings=headings, start=start)
+  
 @portfolio_bp.route('/portfolio/<int:portfolio_id>/<start>')
 def portfolio(portfolio_id, start):
     start = datetime.date(*map(int, start.split('-')))

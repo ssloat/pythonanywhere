@@ -5,17 +5,27 @@ import datetime
 import itertools
 import collections
 
+class PortfolioGroup(db.Model):
+    __tablename__ = 'portfolio_groups'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    #portfolios = db.relationship('Portfolio', backref='portfolio_group')
+ 
 class Portfolio(db.Model):
     __tablename__ = 'portfolios'
 
     id = db.Column(db.Integer, primary_key=True)
+    portfolio_group_id = db.Column(db.Integer, db.ForeignKey('portfolio_groups.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     name = db.Column(db.String(64), nullable=False)
     positions = db.relationship('Position', backref='portfolio')
 
     user = db.relationship('User')
+    portfolio_group = db.relationship('PortfolioGroup', backref='portfolios')
 
-    def __init__(self, user, name):
+    def __init__(self, portfolio_group, user, name):
+        self.portfolio_group = portfolio_group
         self.user = user
         self.name = name
 
@@ -51,7 +61,8 @@ class Portfolio(db.Model):
         return results
 
 
-    def dates(self, start, end):
+    def dates(self, start, end=None):
+        end = end or datetime.date.today()
         dates = itertools.chain(*[
             [p.date for p in pos.asset.prices if p.date >= start and p.date <= end]
             for pos in self.positions
