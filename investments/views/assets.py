@@ -2,7 +2,7 @@ from mysite import db
 
 from flask import Blueprint, jsonify
 
-from investments.assets.models import Asset
+from investments.models.assets import Asset
 
 asset_bp = Blueprint('asset', __name__)
 

@@ -3,7 +3,7 @@ import logging
 from flask.ext.testing import TestCase
 
 from mysite import create_app, db
-
+from mysite.user.models import User
 
 class TestBase(TestCase):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
@@ -16,6 +16,9 @@ class TestBase(TestCase):
     def setUp(self):
         logging.basicConfig(level=logging.ERROR)
         db.create_all()
+
+        self.user = User(id=1, email='user@host.com', name='test') 
+        db.session.add(self.user)
 
     def tearDown(self):
         db.session.remove()

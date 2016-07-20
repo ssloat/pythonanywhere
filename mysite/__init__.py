@@ -10,8 +10,8 @@ lm.login_view = 'user.login'
 
 def create_app(obj=None):
     import mysite.user.views
-    import investments.assets.views
-    import investments.portfolio.views
+    import investments.views.assets
+    import investments.views.portfolio
     import finances.budget.views
     import finances.transaction.views
 
@@ -32,7 +32,7 @@ def create_app(obj=None):
 
     app.register_blueprint(finances.budget.views.budget_bp)
     app.register_blueprint(finances.transaction.views.transaction_bp)
-    app.register_blueprint(investments.portfolio.views.portfolio_bp)
+    app.register_blueprint(investments.views.portfolio.portfolio_bp)
     app.register_blueprint(mysite.user.views.user_bp)
 
     Bootstrap(app)

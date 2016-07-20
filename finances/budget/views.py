@@ -1,7 +1,7 @@
 import collections
 
 from mysite import db
-from finances.budget.models import Budget, Item
+from finances.models.budget import Budget, Item
 from finances.budget.forms import NewBudgetForm
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for

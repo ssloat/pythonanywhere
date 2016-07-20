@@ -5,9 +5,9 @@ from mysite import db
 from flask import Flask
 
 import mysite.user.models
-import investments.assets.models
-import investments.portfolio.models
-import finances.budget.models
+import investments.models.assets
+import investments.models.portfolio
+import finances.models.budget
 import finances.models.transaction
 import finances.models.category
 

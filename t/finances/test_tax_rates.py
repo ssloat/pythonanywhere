@@ -1,7 +1,7 @@
 from nose.tools import assert_equals
 import datetime
 
-from finances.budget.tax_rates import TaxRate, _tax, tax
+from finances.models.tax_rates import TaxRate, _tax, tax
 
 def test__tax():
     tax_rates = [ 

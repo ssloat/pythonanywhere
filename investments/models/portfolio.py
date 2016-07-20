@@ -1,6 +1,6 @@
 from mysite import db
 
-from investments.assets.models import Asset, AssetPrice
+from investments.models.assets import Asset, AssetPrice
 import datetime
 import itertools
 import collections

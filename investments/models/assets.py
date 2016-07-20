@@ -12,13 +12,16 @@ logger = logging.getLogger(__name__)
 DEFINER VIEW `assets` AS 
 select 
    `vanguard_funds`.`fund_type` AS `fund_type`,`vanguard_funds`.`asset_class` AS `asset_class`,
-   `vanguard_funds`.`category` AS `category`,`vanguard_funds`.`name` AS `name`,
-   `vanguard_funds`.`ticker` AS `ticker` 
+   `vanguard_funds`.`category` AS `category`,`vanguard_funds`.`ticker` AS `ticker` 
 from `vanguard_funds` 
 union select 
    'Stock' AS `fund_type`,`stocks`.`sector` AS `asset_class`,`stocks`.`industry` AS `category`,
-   `stocks`.`name` AS `name`,`stocks`.`ticker` AS `ticker` 
+   `stocks`.`ticker` AS `ticker` 
 from `stocks` 
+
+
+insert into assets select ticker, fund_type, asset_class, category from vanguard_funds;
+insert into assets select ticker, 'Stock', sector, industry from stocks;
 """
 
 class Asset(db.Model):
@@ -52,6 +55,9 @@ union
 select concat('VANGUARD-', vp.id) as id, vf.ticker as ticker, vp.date as date, vp.price as close,
    null as open_, null as high, null as low, null as volume
 from vanguard_funds vf, vanguard_prices vp where vp.fund_id=vf.id
+
+insert into asset_prices (ticker, date, close) select ticker, date, price from vanguard_prices vp, vanguard_funds vf where vp.fund_id=vf.id;
+insert into asset_prices (ticker, date, close, open_, high, low, volume) select s.ticker, date, close, open_, high, low, volume from stocks s, stock_prices sp where sp.stock_id=s.id;
 """
 
 class AssetPrice(db.Model):
@@ -78,6 +84,9 @@ class AssetPrice(db.Model):
             'close': self.close,
         }
 
+"""
+insert into asset_dividends (ticker, date, value) select vf.ticker, reinvest_date, price_per_share from vanguard_funds vf, vanguard_dividends vd where vd.fund_id=vf.id;
+"""
 
 class AssetDividend(db.Model):
     __tablename__ = "asset_dividends"

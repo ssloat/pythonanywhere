@@ -80,7 +80,7 @@ class Action(db.Model, AddUser):
 
     category = db.relationship("Category")
 
-    def __init__(self, name, categoryre, category, yearly=False, fixed=None):
+    def __init__(self, user, name, categoryre, category, yearly=False, fixed=None):
         AddUser.__init__(self, user)
 
         self.name = name

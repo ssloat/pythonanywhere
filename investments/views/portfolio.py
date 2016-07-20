@@ -6,8 +6,8 @@ import math
 import itertools
 from dateutil.relativedelta import relativedelta
 
-from investments.portfolio.models import Portfolio, Position
-from investments.assets.models import Asset
+from investments.models.portfolio import Portfolio, Position
+from investments.models.assets import Asset
 from mysite import db
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for
