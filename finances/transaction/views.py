@@ -11,8 +11,8 @@ import StringIO
 from ofxparse import OfxParser
 
 transaction_bp = Blueprint('transaction', __name__, 
-    template_folder='templates',
-    static_folder='static',
+    template_folder='../templates',
+    static_folder='../static',
     static_url_path='/static/transaction',
 )
 

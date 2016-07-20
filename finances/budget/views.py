@@ -8,8 +8,8 @@ from flask import Blueprint, jsonify, render_template, request, redirect, url_fo
 from flask.ext.login import current_user, login_required
 
 budget_bp = Blueprint('budget', __name__, 
-    template_folder='templates',
-    static_folder='static',
+    template_folder='../templates',
+    static_folder='../static',
     static_url_path='/static/budget',
 )
 
