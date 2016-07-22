@@ -1,5 +1,10 @@
 from mysite import db
 from mysite.user.models import AddUser
+from finances.models.category import Category, CategoryRE, Action
+
+import re
+import StringIO
+from ofxparse import OfxParser
 
 class Record(db.Model, AddUser):
     __tablename__ = 'finance_transaction_records'
@@ -7,6 +12,7 @@ class Record(db.Model, AddUser):
     id = db.Column(db.String(128), primary_key=True)
     date = db.Column(db.Date)
     payee = db.Column(db.String(128))
+    amount = db.Column(db.Float)
 
 
 class Transaction(db.Model, AddUser):
@@ -42,4 +48,48 @@ class Transaction(db.Model, AddUser):
         return "<Tran('%d, %s, %s, %s, %s, %s')>" % (
            (self.id or 0), self.date, self.name, self.category, self.amount, self.yearly
         )
+
+def parse_ofx(text):
+    s = StringIO.StringIO(text)
+    ofx = OfxParser.parse(s)
+
+    cres = db.session.query(CategoryRE).all()
+    db_records = set([r.id for r in db.session.query(Record).all()])
+
+    uncat = db.session.query(Category).filter_by(name='uncategorized').first()
+    #cre = CategoryRE(1, '.*')
+    #action = Action(1, None, cre, uncat)
+    #cres.append(cre)
+
+    records = [
+        Record(id=t.id, payee=t.payee, date=t.date, amount=t.amount)
+        for t in ofx.account.statement.transactions
+        if t.id not in db_records
+    ]
+
+    transactions = []
+    for record in records:
+        matched = False
+        for cre in cres:
+            if cre.match(record):
+                transactions += cre.transactions(record)
+                matched = True
+                break
+
+        if not matched:
+            transactions.append({
+                'record': {
+                    'id': record.id,
+                    'date': record.date.strftime('%Y-%m-%d'),
+                    'payee': record.payee,
+                },
+                'date': record.date.strftime('%Y-%m-%d'),
+                'category_id': uncat.id,
+                'category': uncat.name,
+                'name': record.payee,
+                'yearly': '0',
+                'amount': str(record.amount),
+            })
+
+    return transactions
 

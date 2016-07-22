@@ -1,5 +1,5 @@
 from mysite import db
-from finances.models.transaction import Transaction
+from finances.models.transaction import Transaction, parse_ofx
 from finances.models.category import Category, CategoryRE, categoriesSelectBox
 from finances.transaction.forms import NewCategoryForm
 
@@ -7,8 +7,6 @@ from flask import Blueprint, jsonify, render_template, request, redirect, url_fo
 #from flask.ext.login import current_user, login_required
 
 import re
-import StringIO
-from ofxparse import OfxParser
 
 transaction_bp = Blueprint('transaction', __name__, 
     template_folder='../templates',
@@ -39,52 +37,7 @@ def rest_modify_category():
 
 @transaction_bp.route('/rest/upload', methods=['POST'])
 def rest_upload():
-    s = StringIO.StringIO(request.form['text'])
-    ofx = OfxParser.parse(s)
-
-    uncat = db.session.query(Category).filter_by(name='uncategorized').first()
-    cres = db.session.query(CategoryRE).all()
-    tids = set([t.id for t in db.session.query(Transaction).all()])
-
-    transactions = []
-    for t in ofx.account.statement.transactions:
-        if t.id in tids:
-            continue
-
-        category = None
-        for cre in cres:
-            if re.search(cre.pattern, t.payee, flags=re.IGNORECASE):
-                if cre.minimum is not None and t.amount < cre.minimum:
-                    continue
-
-                if cre.maximum is not None and t.amount > cre.maximum:
-                    continue
-
-                for action in cre.actions:
-                    transactions.append({
-                        'id': t.id,
-                        'date': t.date.strftime('%Y-%m-%d'),
-                        'category_id': action.category.id,
-                        'category': action.category.name,
-                        'name': action.name,
-                        'yearly': ('1' if action.yearly else '0'),
-                        'amount': str(action.fixed or t.amount),
-                    })
-
-                break
-        else:
-            #print "Uncategorized: %s, %s, %s" % (dt, des, amt)
-            transactions.append({
-                'id': t.id,
-                'date': t.date.strftime('%Y-%m-%d'),
-                'category_id': uncat.id,
-                'category': uncat.name,
-                'name': t.payee,
-                'yearly': '0',
-                'amount': str(t.amount),
-            })
-
-    return jsonify({'transactions': transactions})
+    return jsonify({'transactions': parse_ofx(request.form['text'])})
 
 @transaction_bp.route('/rest/upload_transactions', methods=['POST'])
 def rest_upload_transactions():

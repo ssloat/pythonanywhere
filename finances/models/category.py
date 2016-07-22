@@ -1,3 +1,5 @@
+import re
+
 from mysite import db
 
 from mysite.user.models import AddUser
@@ -68,13 +70,30 @@ class CategoryRE(db.Model, AddUser):
     def __repr__(self):
        return "<CategoryRE('%s')>" % (self.pattern)
 
+    def match(self, record):
+        if not re.search(self.pattern, record.payee, flags=re.IGNORECASE):
+            return False
+
+        if self.minimum is not None and record.amount < self.minimum:
+            return False
+
+        if self.maximum is not None and record.amount > self.maximum:
+            return False
+
+        return True
+
+    def transactions(self, record):
+        return [action.transaction(record) for action in self.actions]
+
+
+
 class Action(db.Model, AddUser):
     __tablename__ = 'finance_actions'
 
     id = db.Column(db.Integer, primary_key=True)
     categoryre_id = db.Column(db.Integer, db.ForeignKey('finance_category_res.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('finance_categories.id'))
-    name = db.Column(db.String(64))
+    name = db.Column(db.String(64), nullable=False)
     yearly = db.Column(db.Boolean, default=False)
     fixed = db.Column(db.Float, nullable=True)
 
@@ -97,8 +116,21 @@ class Action(db.Model, AddUser):
         else:
             self.category = category
 
-
-
+    def transaction(self, record):
+        return {
+            'record': {
+                'id': record.id,
+                'date': record.date.strftime('%Y-%m-%d'),
+                'payee': record.payee,
+            },
+            'date': record.date.strftime('%Y-%m-%d'),
+            'category_id': self.category.id,
+            'category': self.category.name,
+            'name': (self.name or record.payee),
+            'yearly': ('1' if self.yearly else '0'),
+            'amount': str(self.fixed or record.amount),
+        }
+ 
 def create_categories():
     top = Category('top', None, 0)
 

@@ -17,6 +17,7 @@ class TestTransaction(TestBase):
         top = Category(self.user, 'top', None, 0)
         child = Category(self.user, 'child', top)
         gchild = Category(self.user, 'grandchild', child)
+        uncat = Category(self.user, 'uncategorized', top)
 
         pattern = CategoryRE(self.user, 'pattern')
         db.session.add(pattern)
@@ -25,7 +26,7 @@ class TestTransaction(TestBase):
         action1 = Action(self.user, 'one', pattern, gchild)
         action2 = Action(self.user, 'two', pattern, gchild, yearly=True)
 
-        db.session.add_all([top, child, gchild, pattern, action1, action2])
+        db.session.add_all([top, child, gchild, pattern, action1, action2, uncat])
 
 
     def test_category(self):
