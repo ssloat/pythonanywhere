@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+  {{super()}}
+    <!--Load the AJAX API-->
+    <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['annotationchart']});
+      google.charts.setOnLoadCallback(function(){
+        var data = new google.visualization.DataTable({{table|safe}});
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.AnnotationChart(document.getElementById('linechart_div'));
+        chart.draw(data, {'width': 900, 'height': 300, 'scaleColumns': [1, 0], 'scaleType': 'allfixed'});
+      });
+    </script>
+{% endblock %}
+
+
+{% block mainpane %}
+  <div id="linechart_div"></div>
+  <table class="table table-striped">
+      <tr>{% for elem in ['date', 'cost', 'value', 'return', 'apy'] %}<th>{{elem}}</th>{% endfor %}</tr>
+    <tbody>
+    {% for row in results %}
+      <tr>{% for elem in row %}<td>{{elem|money}}</td>{% endfor %}</tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+

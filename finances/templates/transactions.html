@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block mainpane %}
+<button id="update" type="button" class="btn btn-default">Update</button>
+
+<!--<p><a data-toggle="modal" href="#myModal">New budget</a></p>-->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        <table id="transaction" class="table table-striped">
+          <tr><td>Date</td><td><input type="text" class="datepicker form-control"></input></td></tr>
+          <tr><td>Name</td><td><input type="text" class="form-control"></input></td></tr>
+          <tr><td>Category</td>
+            <td><select class="form-control">
+            {% for c in categories %}
+              <option value='{{c[0]}}'>{{c[1]}}</option>
+            {% endfor %}
+            </select></td>
+           </tr>
+           <tr><td>Amount</td><td><input type="text" class="form-control"></input></td></tr>
+          <tr><td>Yearly</td><td><input type="checkbox" class="form-control"></input></td></tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<table id="transactions" class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th> 
+      <th>Date</th> 
+      <th>Name</th>
+      <th>Category</th>
+      <th>Amount</th>
+      <th>Yearly</th>
+    </tr>
+  </thead>
+  <tbody> {% for row in table %}
+    <tr> 
+      <td><a data-toggle="modal" href="#myModal">{{ row.id }}</a></td>
+      <td><input type='text' class='datepicker form-control' value='{{ row.date }}'></input></td>
+      <td><input type='text' value='{{ row.name }}' class='form-control'></input></td>
+      <td>
+        <select class='form-control'>
+        {% for c in categories %}
+          <option value='{{c[0]}}'{% if c[0] == row.category_id %} selected{% endif %}>{{c[1]}}</option>
+        {% endfor %}
+        </select>
+      </td>
+      <td>{{ row.amount|money }}</td>
+      <td><input type='checkbox'{% if row.yearly %} checked{% endif %} class='form-control'></input></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+  {{super()}}
+<script>
+$(document).ready(function(){
+  $('button#update').click(function(){
+    var trans = [];
+    $("table#transactions tbody tr").each(function(index, elem) {
+      var tds = $(this).find('td')
+      trans.push({
+        id: $(tds[0]).text(),
+        date: $(tds[1]).find('input').val(),
+        name: $(tds[2]).find('input').val(),
+        category_id: $(tds[3]).find('select').val(),
+        amount: $(tds[4]).text(),
+        yearly: $(tds[5]).find('input').prop('checked'),
+      });
+    });
+
+    var form = $('<form></form>');
+    form.attr({method: "post", action: "{{url_for('transaction.update_transactions')}}"});
+    form.append(
+      $('<input></input>').attr({
+        type: "hidden",
+        name: "transactions",
+        value: JSON.stringify(trans),
+      })
+    );
+    $(document.body).append(form);
+    form.submit();
+  });
+
+
+  $("table#transactions tbody tr td a").click(function(){
+    var tds = $(this).parent().parent().find('td');
+    var dests = $("table#transaction tr");
+    $("h4.modal-title").text("Transaction " + $(tds[0]).find('a').text());
+    $(dests[0]).find("input").val( $(tds[1]).find('input').val() );
+    $(dests[1]).find("input").val( $(tds[2]).find('input').val() );
+    $(dests[2]).find("option").each(function(i, elem){
+      if ($(elem).attr('value') == $(tds[3]).find('select').val()) {
+        $(elem).prop('selected', true);
+      }
+    });
+    $(dests[3]).find("input").val( $(tds[4]).text() );
+    $(dests[4]).find("input").prop('checked', $(tds[5]).find('input').prop('checked'));
+  });
+});
+</script>
+{% endblock %}
+ 

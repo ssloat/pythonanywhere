@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block navbar_about %} class="active" {% endblock %}
+{% block mainpane %}
+<label class="btn btn-default btn-file">
+    Browse <input id="fileinput" type="file" style="display: none;">
+</label>
+
+<button type="button" class="btn btn-default">Upload</button>
+
+<table id="output" class="table table-striped">
+    <thead><tr>
+      <th>date</th>
+      <th>name</th>
+      <th>category</th>
+      <th>amount</th>
+      <th>yearly</th>
+    </tr></thead>
+    <tbody></tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+  {{super()}}
+<script>
+$(document).ready(function(){
+  $("input#fileinput").change(function(){
+    var reader = new FileReader();
+
+    reader.onload = function(){
+      $.post(
+        "{{url_for('transaction.rest_parse_records')}}", 
+        { 
+          text: reader.result 
+        },
+        function(data, status) {
+          var trans = data['transactions'];
+          for (i=0; i<trans.length; i++) {
+            var row = $("<tr></tr>");
+            $(row).attr({record: trans[i]['record']});
+            $(row).append( $("<td></td>").text(trans[i]['date']) );
+            $(row).append( $("<td></td>").text(trans[i]['name']) );
+            var select = $("<select></select").attr({name: 'category', class: 'form-control'});
+            {% for category in categories %}
+              $(select).append( 
+                $("<option></option>").attr('value', '{{category[0]}}').text("{{category[1]|safe}}") 
+              );
+            {% endfor %}
+            $(select).children().each(function(){
+              if ($(this).attr('value') == trans[i]['category_id']) {
+                $(this).prop('selected', true);
+              }
+            });
+            $(row).append( $("<td></td>").append(select) );
+            $(row).append( $("<td></td>").text(trans[i]['amount']) );
+            var check = $("<input></input>").attr('type', 'checkbox');
+            if (trans[i]['yearly'] == '1') {
+                $(check).attr('checked', true)
+            }
+            $(row).append( $("<td></td>").append(check) );
+            $(row).append( $("<td></td>").text(trans[i]['id']) );
+
+            $("table#output tbody").append(row);
+          }
+        }
+      );
+    }
+
+    $("table#output tbody tr").remove();
+    reader.readAsText($(this)[0].files[0]);
+  });
+
+  $('button').click(function(){
+    var trans = [];
+    $("table#output tbody tr").each(function(index, elem) {
+      var tds = $(this).children();
+      var select = $(tds[2]).children().first();
+      var input = $(tds[4]).children()[0];
+      trans.push({
+        record: $(this).attr('record'),
+        date: $(tds[0]).text(),
+        name: $(tds[1]).text(),
+        category_id: $(select).val(),
+        amount: $(tds[3]).text(),
+        yearly: $(input).prop('checked'),
+      });
+    });
+    //console.log(trans);
+    $.post(
+      "{{url_for('transaction.rest_upload_transactions')}}", 
+      { transactions: JSON.stringify(trans) },
+      function(data, status) {
+        $("table#output tbody tr").remove();
+      }
+    );
+  });
+});
+</script>
+{% endblock %}
+

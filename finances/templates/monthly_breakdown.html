@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block styles %}
+  {{ super() }}
+  <!-- treetable http://ludo.cubicphuse.nl/jquery-treetable/ -->
+  <!-- treetable ajax persist https://github.com/jughead/jquery-treetable-ajax-persist -->
+  <link rel="stylesheet" href="{{url_for('transaction.static', filename='css/jquery.treetable.css')}}" type="text/css" />
+  <link rel="stylesheet" href="{{url_for('transaction.static', filename='css/jquery.treetable.theme.default.css')}}" type="text/css" />
+  <link rel="stylesheet" href="{{url_for('transaction.static', filename='css/screen.css')}}" type="text/css" /> 
+{% endblock %}
+{% block navbar_budget %} class="active"{% endblock %}
+{% block mainpane %}
+    <div class="table-responsive">
+    <table id="budget-table" class="table table-striped">
+    <thead>
+        <tr>
+            {% for item in table.headings %}
+            <th width=50>{{item}}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for row in table.rows %}
+        <tr data-tt-id="{{row.category.id}}" {% if row.category.parent %} data-tt-parent-id="{{row.category.parent.id}}" {% endif %}>
+            <td style="white-space: nowrap"><a href="{{url_for('transaction.transactions', category_id=row.category.id)}}">{{row.category.name}}</a></td>
+            <td align="right">{{row.average|comma}}</td>
+            {% for item in row.data %} <td align="right">{{item[0]|comma}}</td> {% endfor %}
+            <td align="right">{{row.yearly|comma}}</td>
+            <td align="right">{{row.total|comma}}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script src="{{url_for('transaction.static', filename='js/jquery.treetable-ajax-persist.js')}}"></script>
+  <script src="{{url_for('transaction.static', filename='js/jquery.treetable.js')}}"></script>
+  <script src="{{url_for('transaction.static', filename='js/persist-min.js')}}"></script>
+  <script type="text/javascript">
+  $(document).ready(function(){
+      $("#budget-table").agikiTreeTable({persist: true, persistStoreName: "files"});
+  });
+  </script>
+{% endblock %}
+
