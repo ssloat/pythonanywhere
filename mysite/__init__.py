@@ -12,8 +12,8 @@ def create_app(obj=None):
     import mysite.user.views
     import investments.views.assets
     import investments.views.portfolio
-    import finances.budget.views
-    import finances.transaction.views
+    import finances.views.budget
+    import finances.views.transaction
 
     app = Flask(__name__)
     app.config.from_object(obj or 'config')
@@ -30,8 +30,8 @@ def create_app(obj=None):
     db.init_app(app)
     lm.init_app(app)
 
-    app.register_blueprint(finances.budget.views.budget_bp)
-    app.register_blueprint(finances.transaction.views.transaction_bp)
+    app.register_blueprint(finances.views.budget.budget_bp)
+    app.register_blueprint(finances.views.transaction.transaction_bp)
     app.register_blueprint(investments.views.portfolio.portfolio_bp)
     app.register_blueprint(mysite.user.views.user_bp)
 

@@ -27,7 +27,15 @@
       <div class="collapse navbar-collapse" id="myNavbar">
         <ul class="nav navbar-nav">
           <li{% block navbar_home %}{% endblock %}><a href="/">Home</a></li>
-          <li{% block navbar_budget %}{% endblock %}><a href={{url_for('budget.budgets')}}>Budget</a></li>
+<!--            {% block navbar_budget %}{% endblock %}><a href={{url_for('budget.budgets')}}>Budget</a></li> -->
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Finances<span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="{{url_for('budget.budgets')}}">Budgets</a></li>
+              <li><a href="{{url_for('transaction.upload_transactions')}}">Upload Transactions</a></li>
+              <li><a href="{{url_for('transaction.monthly_breakdown')}}">Monthly Breakdown</a></li>
+            </ul>
+          </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
@@ -63,7 +71,7 @@
       {% endwith %}
 
       {% block mainpane %} {% endblock %}
-
+      </div>
       <div class="col-md-1"> </div>
     </div>
   </div>

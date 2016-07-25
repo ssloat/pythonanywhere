@@ -71,7 +71,6 @@ class Budget(db.Model):
 
         return tax(rates, self.agi)
 
-
 class Table(object):
     sortkeys = {'income': 1, 'pretax': 2}
     def __init__(self, name):

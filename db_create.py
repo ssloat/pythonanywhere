@@ -10,6 +10,7 @@ import investments.models.portfolio
 import finances.models.budget
 import finances.models.transaction
 import finances.models.category
+import finances.models.pattern
 
 app = Flask(__name__)
 app.config.from_object('config')

@@ -5,7 +5,8 @@ import logging
 
 from mysite import db
 from finances.models.transaction import Transaction
-from finances.models.category import Category, CategoryRE, Action, create_categories
+from finances.models.category import Category, create_categories
+from finances.models.pattern import Pattern, Action
 
 from t.base_test import TestBase
 
@@ -19,7 +20,7 @@ class TestTransaction(TestBase):
         gchild = Category(self.user, 'grandchild', child)
         uncat = Category(self.user, 'uncategorized', top)
 
-        pattern = CategoryRE(self.user, 'pattern')
+        pattern = Pattern(self.user, 'pattern')
         db.session.add(pattern)
         db.session.commit()
 
@@ -36,7 +37,7 @@ class TestTransaction(TestBase):
         assert_equals(child.parent.name, 'top')
         assert_equals(len(child.children), 1)
 
-        pattern = db.session.query(CategoryRE).first()
+        pattern = db.session.query(Pattern).first()
         """
         for action, id in zip(pattern.actions, ('a', 'b')):
             action.load(id, datetime.date(2016, 7, 4), 5.25)
