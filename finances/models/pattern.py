@@ -1,5 +1,4 @@
 import re
-import json
 from mysite import db
 
 from mysite.user.models import AddUser
@@ -74,17 +73,17 @@ class Action(db.Model, AddUser):
 
     def transaction(self, record):
         return {
-            'record': json.dumps({
+            'record': {
                 'id': record.id,
                 'date': record.date.strftime('%Y-%m-%d'),
                 'payee': record.payee,
                 'amount': float(record.amount),
-            }),
+            },
             'date': record.date.strftime('%Y-%m-%d'),
             'category_id': self.category.id,
             'category': self.category.name,
             'name': (self.name or record.payee),
             'yearly': ('1' if self.yearly else '0'),
-            'amount': str(self.fixed or float(record.amount)),
+            'amount': self.fixed or float(record.amount),
         }
  
