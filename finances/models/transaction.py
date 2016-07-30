@@ -3,6 +3,7 @@ from mysite.user.models import AddUser
 from finances.models.category import Category, allChildren
 from finances.models.pattern import Pattern
 
+import json
 import datetime
 import StringIO
 
