@@ -36,7 +36,7 @@ class AddUser(object):
         return db.relationship('User')
 
     def __init__(self, user):
-        if isinstance(user, int):
+        if isinstance(user, (int, long)):
             self.user_id = user
         else:
             self.user = user
