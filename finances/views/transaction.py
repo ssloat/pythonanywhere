@@ -64,7 +64,7 @@ def rest_parse_records():
 @transaction_bp.route('/rest/finances/upload_transactions', methods=['POST'])
 @login_required
 def rest_upload_transactions():
-    transaction.save_transactions( json.loads(request.form['transactions']) )
+    transaction.save_transactions( current_user.id, json.loads(request.form['transactions']) )
     return jsonify({'results': 'success'})
 
 @transaction_bp.route('/rest/finances/update_transactions', methods=['POST'])

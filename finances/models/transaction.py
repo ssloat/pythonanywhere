@@ -81,14 +81,14 @@ def parse_ofx(text):
 
     return transactions
 
-def save_transactions(transactions):
+def save_transactions(user_id, transactions):
     records = {}
     for transaction in transactions:
         rec = json.loads(transaction['record'])
         records[rec['id']] = rec
 
         t = Transaction(
-            user=current_user.id, 
+            user=user_id, 
             date=datetime.date(*[int(x) for x in transaction['date'].split('-')]),
             name=transaction['name'],
             category=int(transaction['category_id']),
@@ -101,7 +101,7 @@ def save_transactions(transactions):
 
     db.session.add_all([
         Record(
-            user_id=current_user.id, 
+            user_id=user_id, 
             id=record['id'],
             date=datetime.date(*[int(x) for x in record['date'].split('-')]),
             payee=record['payee'],
