@@ -43,8 +43,11 @@
               <span class="glyphicon glyphicon-user"></span> User <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href={{url_for('user.login')}}><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+              {% if current_user.is_authenticated %}
               <li><a href={{url_for('user.logout')}}>Logout</a></li>
+              {% else %}
+              <li><a href={{url_for('user.login')}}><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+              {% endif %}
             </ul>
           </li>
           <li{% block navbar_about %}{% endblock %}><a href="/about">About</a></li>

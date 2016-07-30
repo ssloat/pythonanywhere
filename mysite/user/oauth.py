@@ -62,9 +62,18 @@ class FacebookSignIn(OAuthSignIn):
         )
         me = oauth_session.get('me?fields=id,name,email').json()
 
+        names = me.get('name').split(' ')
+        if len(names) == 1:
+            first_name = names[0]
+            last_name = None
+        else:
+            first_name = ' '.join(names[:-1])
+            last_name = names[-1]
+
         return (
             'facebook$' + me['id'],
-            me.get('name'),
+            first_name,
+            last_name,
             me.get('email')
         )
 
@@ -102,9 +111,18 @@ class GoogleSignIn(OAuthSignIn):
         )
         me = oauth_session.get('userinfo').json()
 
+        names = me.get('name').split(' ')
+        if len(names) == 1:
+            first_name = names[0]
+            last_name = None
+        else:
+            first_name = ' '.join(names[:-1])
+            last_name = names[-1]
+
         return (
             'google$' + me['id'],
-            me.get('name'),
+            first_name,
+            last_name,
             me.get('email')
         )
 

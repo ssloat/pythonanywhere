@@ -5,7 +5,7 @@
     <h2>Hi, {{ current_user.name }}!</h2>
     <p><a href="{{ url_for('user.logout') }}">Logout</a></p>
   {% else %}
-    <h2>Welcome</h2>
+    <h2>Welcome Stranger.  Want to try logging in?</h2>
   {% endif %}
 {% endblock %}
 
