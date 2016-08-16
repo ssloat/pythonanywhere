@@ -9,6 +9,7 @@
 {% endblock %}
 {% block navbar_budget %} class="active"{% endblock %}
 {% block mainpane %}
+    {% include "transaction_dates.html" %}
     <div class="table-responsive">
     <table id="budget-table" class="table table-striped">
     <thead>

@@ -2,10 +2,12 @@ from mysite import db
 from finances.models import transaction
 from finances.models.category import categoriesSelectBox
 
-from flask import Blueprint, jsonify, render_template, request, redirect, url_for
+from flask import Blueprint, jsonify, render_template, request, redirect, url_for, session
 from flask.ext.login import current_user, login_required
 
 import json
+import datetime
+from dateutil.relativedelta import relativedelta
 
 transaction_bp = Blueprint('transaction', __name__, 
     template_folder='../templates',
@@ -21,6 +23,22 @@ def money_filter(s):
 def comma_filter(s):
     return "{:,.2f}".format(s)
 
+def _dates():
+    today = datetime.date.today()
+
+    if 'from_date' in session:
+        from_date = datetime.date(*[int(x) for x in session['from_date'].split('-')])
+    else:
+        from_date = today.replace(month=1, day=1)
+        session['from_date'] = from_date.strftime('%Y-%m-%d')
+
+    if 'to_date' in session:
+        to_date = datetime.date(*[int(x) for x in session['to_date'].split('-')])
+    else:
+        to_date = today.replace(day=1) + relativedelta(months=1) - datetime.timedelta(days=1)
+        session['to_date'] = to_date.strftime('%Y-%m-%d')
+
+    return from_date, to_date
 
 @transaction_bp.route('/finances/transactions')
 @transaction_bp.route('/finances/transactions/<category_id>')
@@ -40,12 +58,10 @@ def upload_transactions():
 @transaction_bp.route('/finances/monthly_breakdown')
 @login_required
 def monthly_breakdown():
-    import datetime
-    start = datetime.date(2016, 1, 1)
-    end = datetime.date(2016, 6, 30)
+    from_date, to_date = _dates()
     return render_template(
         'monthly_breakdown.html', 
-        table=transaction.monthly_breakdown(start, end), 
+        table=transaction.monthly_breakdown(from_date, to_date), 
     )
 
 @transaction_bp.route('/finances/update_transactions', methods=['POST'])

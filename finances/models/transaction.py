@@ -152,7 +152,11 @@ def monthly_breakdown(from_date, to_date):
     for cat in [top]+allChildren(top):
         cols = [(sum(results.get(cat.id, {k: []}).get(k, []), 0.0), k) for k in keys[::-1] + ['yearly']]
         table['rows'].append({
-            'category': cat,
+            'category': {
+                'id': cat.id,
+                'name': cat.name,
+                'parent_id': (None if not cat.parent else cat.parent.id),
+            },
             'data': cols[:-1], 
             'yearly': cols[-1][0],
             'total': sum([c[0] for c in cols]),
