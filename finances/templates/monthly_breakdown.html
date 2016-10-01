@@ -9,9 +9,8 @@
 {% endblock %}
 {% block navbar_budget %} class="active"{% endblock %}
 {% block mainpane %}
-    {% include "transaction_dates.html" %}
-    <div class="table-responsive">
-    <table id="budget-table" class="table table-striped">
+  <div class="table-responsive"> 
+    <table id="budget-table" class="table treetable"> 
     <thead>
         <tr>
             {% for item in table.headings %}
@@ -21,7 +20,7 @@
     </thead>
     <tbody>
     {% for row in table.rows %}
-        <tr data-tt-id="{{row.category.id}}" {% if row.category.parent %} data-tt-parent-id="{{row.category.parent.id}}" {% endif %}>
+        <tr data-tt-id="{{row.category.id}}" {% if row.category.parent_id %} data-tt-parent-id="{{row.category.parent_id}}" {% endif %}>
             <td style="white-space: nowrap"><a href="{{url_for('transaction.transactions', category_id=row.category.id)}}">{{row.category.name}}</a></td>
             <td align="right">{{row.average|comma}}</td>
             {% for item in row.data %} <td align="right">{{item[0]|comma}}</td> {% endfor %}
