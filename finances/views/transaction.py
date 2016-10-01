@@ -39,7 +39,7 @@ def _dates():
 
             session[k] = dates[i].strftime('%Y-%m-%d')
 
-    return *dates
+    return dates
 
 @transaction_bp.route('/finances/transactions')
 @transaction_bp.route('/finances/transactions/<category_id>')
