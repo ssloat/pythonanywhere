@@ -9,7 +9,9 @@ import json
 import datetime
 from dateutil.relativedelta import relativedelta
 
-transaction_bp = Blueprint('transaction', __name__, 
+transaction_bp = Blueprint(
+    'transaction', 
+    __name__, 
     template_folder='../templates',
     static_folder='../static',
     static_url_path='/static/finances',
@@ -25,20 +27,19 @@ def comma_filter(s):
 
 def _dates():
     today = datetime.date.today()
+    dates = [
+        today.replace(month=1, day=1),
+        today.replace(day=1) + relativedelta(months=1) - datetime.timedelta(days=1)
+    ]
 
-    if 'from_date' in session:
-        from_date = datetime.date(*[int(x) for x in session['from_date'].split('-')])
-    else:
-        from_date = today.replace(month=1, day=1)
-        session['from_date'] = from_date.strftime('%Y-%m-%d')
+    for i, k in ['from_date', 'to_date']:
+        if request.args.get(k) or k in session:
+            s = request.args.get(k) or session[k]
+            dates[i] = datetime.date(*[int(x) for x in s.split('-')])
 
-    if 'to_date' in session:
-        to_date = datetime.date(*[int(x) for x in session['to_date'].split('-')])
-    else:
-        to_date = today.replace(day=1) + relativedelta(months=1) - datetime.timedelta(days=1)
-        session['to_date'] = to_date.strftime('%Y-%m-%d')
+            session[k] = dates[i].strftime('%Y-%m-%d')
 
-    return from_date, to_date
+    return *dates
 
 @transaction_bp.route('/finances/transactions')
 @transaction_bp.route('/finances/transactions/<category_id>')
