@@ -32,7 +32,7 @@ def _dates():
         today.replace(day=1) + relativedelta(months=1) - datetime.timedelta(days=1)
     ]
 
-    for i, k in ['from_date', 'to_date']:
+    for i, k in enumerate(['from_date', 'to_date']):
         if request.args.get(k) or k in session:
             s = request.args.get(k) or session[k]
             dates[i] = datetime.date(*[int(x) for x in s.split('-')])
