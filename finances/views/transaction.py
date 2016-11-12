@@ -42,7 +42,7 @@ def _dates():
     return dates
 
 @transaction_bp.route('/finances/transactions')
-@transaction_bp.route('/finances/transactions/<category_id>')
+@transaction_bp.route('/finances/transactions/<int:category_id>')
 @login_required
 def transactions(category_id=None):
     return render_template(
