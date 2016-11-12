@@ -49,6 +49,9 @@ def categoriesSelectBox(cat=None):
     return results
 
 def allChildren(cat=None):
+    if isinstance(cat, int):
+        cat = db.session.query(Category).filter(Category.id==cat).first()
+        
     cat = cat or db.session.query(Category).filter(Category.name=='top').first()
     results = []
     for c in list(cat.children):

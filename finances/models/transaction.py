@@ -166,8 +166,10 @@ def monthly_breakdown(from_date, to_date):
     return table
 
 def transactions(category_id=None):
+    cats = allChildren(category_id)
+
     return db.session.query(Transaction).join(Category).filter(
-        Category.id==category_id,
+        Category.id.in([c.id for c in cats]),
         Transaction.date>=datetime.date(2016, 1, 1),
     ).order_by(Transaction.date).all()
 
