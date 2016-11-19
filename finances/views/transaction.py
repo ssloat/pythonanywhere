@@ -51,6 +51,12 @@ def transactions(category_id=None):
         categories=categoriesSelectBox(),
     )
 
+@transaction_bp.route('/finances/manual_entry')
+@login_required
+def manual_entry():
+    return render_template('manual_entry.html', categories=categoriesSelectBox())
+
+
 @transaction_bp.route('/finances/upload_transactions')
 @login_required
 def upload_transactions():
@@ -88,6 +94,12 @@ def rest_upload_transactions():
 @login_required
 def rest_update_transactions():
     transaction.update_transactions( json.loads(request.form['transactions']) )
+    return jsonify({'results': 'success'})
+
+@transaction_bp.route('/rest/finances/manual_entry', methods=['POST'])
+@login_required
+def rest_manual_entry():
+    transaction.add_manual_entry(current_user.id, json.loads(request.form['entry']))
     return jsonify({'results': 'success'})
 
 

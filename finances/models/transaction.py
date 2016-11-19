@@ -186,3 +186,26 @@ def update_transactions(transactions):
 
     db.session.commit()
 
+def add_manual_entry(user_id, entry):
+    date = datetime.date(*[int(x) for x in entry['date'].split('-')])
+    db.session.add_all([
+        Transaction(
+            user=user_id, 
+            date=date,
+            name=entry['name'],
+            category=int(entry['category_id']),
+            amount=-1.0*float(entry['amount']),
+            yearly=False,
+        ),
+        Transaction(
+            user=user_id, 
+            date=date,
+            name=entry['name'],
+            category=int(entry['deduct_id']),
+            amount=float(entry['amount']),
+            yearly=False,
+        ),
+    ])
+
+    db.session.commit()
+
