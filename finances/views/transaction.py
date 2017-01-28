@@ -27,10 +27,8 @@ def comma_filter(s):
 
 def _dates():
     today = datetime.date.today()
-    dates = [
-        today.replace(month=1, day=1),
-        today.replace(day=1) + relativedelta(months=1) - datetime.timedelta(days=1)
-    ]
+    next_month = today.replace(day=1) + relativedelta(months=1)
+    dates = [ next_month - relativedelta(months=12), next_month - datetime.timedelta(days=1) ]
 
     for i, k in enumerate(['from_date', 'to_date']):
         if request.args.get(k) or k in session:

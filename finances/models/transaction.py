@@ -106,9 +106,6 @@ def save_transactions(user_id, transactions):
     db.session.commit()
 
 def monthly_breakdown(from_date, to_date):
-    from_date = from_date.replace(day=1)
-    to_date = to_date.replace(day=1) + relativedelta(months=1)
-
     months = []
     tmpdate = datetime.date(from_date.year, from_date.month, from_date.day)
     while tmpdate < to_date:
@@ -164,7 +161,7 @@ def transactions(category_id=1):
             [category_id] + [c.id for c in allChildren(category_id)]
         ),
         Transaction.date>=datetime.date(2016, 1, 1),
-    ).order_by(Transaction.date).all()
+    ).order_by(Transaction.date.desc()).all()
 
 def update_transactions(transactions):
     for transaction in transactions:
