@@ -1,6 +1,7 @@
 from mysite import db
 from mysite.user.models import AddUser
 from finances.models.category import Category, allChildren
+from finances.models.record import Record
 from finances.models.pattern import Pattern
 
 import json
@@ -9,14 +10,6 @@ import StringIO
 
 from ofxparse import OfxParser
 from dateutil.relativedelta import relativedelta
-
-class Record(db.Model, AddUser):
-    __tablename__ = 'finance_transaction_records'
-
-    id = db.Column(db.String(128), primary_key=True)
-    date = db.Column(db.Date)
-    payee = db.Column(db.String(128))
-    amount = db.Column(db.Float)
 
 
 class Transaction(db.Model, AddUser):
