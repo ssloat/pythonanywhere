@@ -16,7 +16,7 @@ class Category(db.Model, AddUser):
 
     def __init__(self, user, name, parent=None, depth=0):
         AddUser.__init__(self, user)
-        self.name   = name
+        self.name = name
 
         if parent:
             self.parent = parent
