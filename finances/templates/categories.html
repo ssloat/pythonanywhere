@@ -12,7 +12,7 @@
   <script src={{url_for('transaction.static', filename='js/jquery.easyui.min.js')}}></script>
   <script>
     $("#tt").tree({
-      url: "{{url_for('transaction.rest_categories')}}",
+      url: "{{url_for('category.rest_categories')}}",
       method: 'GET',
       dnd: 'true',
       animate: 'true',
@@ -27,7 +27,7 @@
       },
       onDrop: function(target, source, point) {
         var target_id = $('#tt').tree('getNode', target).id;
-        $.post("{{url_for('transaction.rest_modify_category')}}",
+        $.post("{{url_for('category.rest_modify_category')}}",
             {
                 'id': source.id,
                 'parent_id': target_id,
@@ -43,9 +43,11 @@
     <div class="row">
       <div class="col-md-3"> 
         <ul id="tt" class="easyui-tree" data-options="animate:true"> </ul>
+      </div>
+      <div class="col-md-2"> 
         {{ wtf.quick_form(form) }}
       </div>
-      <div class="col-md-9"> </div>
+      <div class="col-md-7"></div>
     </div>
   </div>
 
