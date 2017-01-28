@@ -44,7 +44,7 @@ $(document).ready(function(){
     for (i=0; i<fuse.results.length; i++) {
       var item = fuse.results[i].item;
       var row = $("<tr>")
-        .append("<td><a href=/finances/pattern/\""+item.id+">"+item.id+"</a></td>")
+        .append("<td><a href=\"/finances/pattern/"+item.id+"\">"+item.id+"</a></td>")
         .append( $("<td>").text(item.pattern) )
         .append( $("<td>").text(item.minimum) )
         .append( $("<td>").text(item.maximum) )
