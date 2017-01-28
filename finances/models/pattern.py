@@ -3,6 +3,7 @@ from mysite import db
 
 from mysite.user.models import AddUser
 from finances.models.category import Category
+from finances.models.record import Record
 
  
 class Pattern(db.Model, AddUser):
@@ -87,3 +88,45 @@ class Action(db.Model, AddUser):
             'amount': self.fixed or float(record.amount),
         }
  
+def patterns(user_id):
+    return [
+        {
+            'id': x.id,
+            'pattern': x.pattern,
+            'minimum': x.minimum,
+            'maximum': x.maximum,
+        }
+        for x in db.session.query(Pattern).filter(Pattern.user_id==user_id).all()
+    ]
+
+def pattern(user_id, pattern_id):
+    p = db.session.query(Pattern).filter(
+        Pattern.user_id==user_id,
+        Pattern.id==pattern_id,
+    ).first()
+
+    records = [
+        r for r in db.session.query(Record).filter(Record.user_id==user_id)
+        if p.match(r)
+    ]
+
+    actions = db.session.query(Action).filter(
+        Action.user_id==user_id,
+        Action.pattern_id==pattern_id,
+    )
+
+    return { 'pattern': p, 'records': records, 'actions': actions }
+
+def search(user_id, text):
+    return [
+        {
+            'id': p.id,
+            'pattern': p.pattern,
+            'minimum': p.minimum,
+            'maximum': p.maximum,
+        }
+        for p in db.session.query(Pattern).filter(Pattern.user_id==user_id)
+        if re.search(p.pattern, text, flags=re.IGNORECASE)
+    ]
+
+

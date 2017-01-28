@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block mainpane %}
+
+<h2>Pattern</h2>
+<div class="row">
+  <div class="col-md-4">
+    <table id="pattern" class="table table-striped">
+      <tbody> 
+        <tr> 
+          <td>Pattern</td>
+          <td>{{ pattern.pattern }}</td>
+        </tr> 
+        <tr> 
+          <td>Minimum</td>
+          <td>{{ pattern.minimum|money }}</td>
+        <tr> 
+        </tr> 
+        <tr> 
+          <td>Maximum</td>
+          <td>{{ pattern.maximum|money }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-8"></div>
+</div>
+
+<h2>Actions</h2>
+<table id="actions" class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>category</th>
+      <th>text</th>
+      <th>amount</th>
+      <th>yearly</th>
+    </tr>
+  </thead>
+  <tbody> {% for row in actions %}
+    <tr> 
+      <td>{{ row.id }}</td>
+      <td>{{ row.category.name }}</td>
+      <td>{{ row.name }}</td>
+      <td>{{ row.fixed|money }}</td>
+      <td>{{ row.yearly }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Records</h2>
+<table id="records" class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>date</th>
+      <th>payee</th>
+      <th>amount</th>
+    </tr>
+  </thead>
+  <tbody> {% for row in records %}
+    <tr> 
+      <td>{{ row.id }}</td>
+      <td>{{ row.date }}</td>
+      <td>{{ row.payee }}</td>
+      <td>{{ row.amount|money }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+ 
+
