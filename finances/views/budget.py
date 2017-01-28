@@ -5,7 +5,7 @@ from finances.models.budget import Budget, Item
 from finances.forms.budget import NewBudgetForm
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for
-from flask.ext.login import current_user, login_required
+from flask_login import current_user, login_required
 
 budget_bp = Blueprint('budget', __name__, 
     template_folder='../templates',

@@ -3,7 +3,7 @@ from finances.models import transaction
 from finances.models.category import categoriesSelectBox
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, session
-from flask.ext.login import current_user, login_required
+from flask_login import current_user, login_required
 
 import json
 import datetime
@@ -68,7 +68,7 @@ def monthly_breakdown():
     from_date, to_date = _dates()
     return render_template(
         'monthly_breakdown.html', 
-        table=transaction.monthly_breakdown(from_date, to_date), 
+        table=transaction.monthly_breakdown(from_date, to_date),
     )
 
 @transaction_bp.route('/finances/update_transactions', methods=['POST'])

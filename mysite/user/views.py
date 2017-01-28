@@ -4,7 +4,7 @@ from mysite.user.models import User, ProviderId
 from mysite.user.oauth import OAuthSignIn
 
 from flask import Blueprint, render_template, redirect, url_for 
-from flask.ext.login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user
 
 
 user_bp = Blueprint('user', __name__, template_folder='templates')

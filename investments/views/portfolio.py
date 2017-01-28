@@ -11,7 +11,7 @@ from investments.models.assets import Asset
 from mysite import db
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for
-from flask.ext.login import current_user, login_required
+from flask_login import current_user, login_required
 
 portfolio_bp = Blueprint('portfolio', __name__, 
     template_folder='../templates',
@@ -48,7 +48,7 @@ def portfolio(portfolio_id, start):
     #if p.user_id != current_user.id:
     #    return redirect(url_for('user.access_denied'))
 
-    values, returns = p.table_categories(start, datetime.date(2016, 12, 31))
+    values, returns = p.table_categories(start, datetime.date(2017, 12, 31))
 
     return render_template('portfolio.html', values=values, returns=returns)
  
