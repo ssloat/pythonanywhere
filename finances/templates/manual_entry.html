@@ -45,7 +45,7 @@
       <div class="form-group">
         <label class="col-xs-3 control-label">&nbsp</label>
         <div class="col-xs-9">
-          <input class="btn btn-default" id="add_item" value="add">
+          <input class="btn btn-default" id="add_item" value="add" readonly>
         </div>
       </div>
     </form>
@@ -72,8 +72,8 @@ $(document).ready(function(){
         $("input#date").val('');
         $("input#name").val('');
         $("input#amount").val('');
-        $("select#category").empty();
-        $("select#deduct").empty();
+        $("select#category").val('{{ categories[0][1] }}');
+        $("select#deduct").val('{{ categories[0][1] }}');
       }
     );
   });
