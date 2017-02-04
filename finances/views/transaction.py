@@ -27,6 +27,9 @@ def comma_filter(s):
 
 def _dates():
     today = datetime.date.today()
+    if today.day < 12:
+        today = today - relativedelta(months=1)
+
     next_month = today.replace(day=1) + relativedelta(months=1)
     dates = [ next_month - relativedelta(months=12), next_month - datetime.timedelta(days=1) ]
 

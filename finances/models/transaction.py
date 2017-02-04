@@ -108,7 +108,7 @@ def save_transactions(user_id, transactions):
 def monthly_breakdown(from_date, to_date):
     months = []
     tmpdate = datetime.date(from_date.year, from_date.month, from_date.day)
-    while tmpdate < to_date:
+    while tmpdate <= to_date:
         months.append(datetime.date(tmpdate.year, tmpdate.month, 1))
         tmpdate += relativedelta(months=1)
 
@@ -116,7 +116,7 @@ def monthly_breakdown(from_date, to_date):
     catids = dict([(c.id, c.name) for c in cats])
     keys = [m.strftime('%Y-%m') for m in months]
     ts = db.session.query(Transaction)\
-        .filter(Transaction.date>=from_date, Transaction.date<to_date)
+        .filter(Transaction.date>=from_date, Transaction.date<=to_date)
 
     cat_keys = {} 
     results = {}
