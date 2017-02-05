@@ -48,8 +48,9 @@ def _dates():
 def transactions(category_id=None):
     return render_template(
         'transactions.html', 
-        table=transaction.transactions(category_id),
-        categories=categoriesSelectBox(),
+        #table=transaction.transactions(category_id),
+        category_id=category_id,
+        #categories=categoriesSelectBox(),
     )
 
 @transaction_bp.route('/finances/manual_entry')
@@ -79,6 +80,14 @@ def update_transactions():
     return redirect(url_for('transaction.monthly_breakdown'))
 
 
+
+@transaction_bp.route('/rest/finances/transactions/<int:category_id>', methods=['GET', 'POST'])
+@login_required
+def rest_transactions(category_id):
+    from_date, to_date = _dates()
+    results = transaction.transactions(category_id, from_date, to_date)
+    results.update({'categories': categoriesSelectBox()})
+    return jsonify(results)
 
 @transaction_bp.route('/rest/finances/parse_records', methods=['POST'])
 @login_required

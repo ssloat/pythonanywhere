@@ -7,6 +7,7 @@ from finances.models.pattern import Pattern
 import json
 import datetime
 import StringIO
+from collections import defaultdict
 
 from ofxparse import OfxParser
 from dateutil.relativedelta import relativedelta
@@ -155,13 +156,40 @@ def monthly_breakdown(from_date, to_date):
 
     return table
 
-def transactions(category_id=1):
-    return db.session.query(Transaction).join(Category).filter(
+def transactions(category_id, from_date, to_date):
+    trans = db.session.query(Transaction).join(Category).filter(
         Category.id.in_(
             [category_id] + [c.id for c in allChildren(category_id)]
         ),
-        Transaction.date>=datetime.date(2016, 1, 1),
+        Transaction.date>=from_date,
+        Transaction.date<=to_date,
     ).order_by(Transaction.date.desc()).all()
+
+    results = []
+    monthly = defaultdict(int)
+    for tran in trans:
+        results.append({
+            'id': tran.id,
+            'date': tran.date.strftime('%Y-%m-%d'),
+            'name': tran.name,
+            'category_id': tran.category_id,
+            'amount': tran.amount,
+        })
+
+        monthly[tran.date.strftime('%Y/%m')] += tran.amount
+
+    avg = float(sum(monthly.values())) / len(monthly.values())
+    name = db.session.query(Category).filter(Category.id==category_id).first().name
+
+    monthly_data = [ ['Month', name, 'Average'] ]
+    for k in reversed(sorted(monthly.keys())):
+        monthly_data.append([k, abs(monthly[k]), abs(avg)])
+
+    return {
+        'transactions': results, 
+        'monthly_data': monthly_data,
+    }
+
 
 def update_transactions(transactions):
     for transaction in transactions:

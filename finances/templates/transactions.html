@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block mainpane %}
+<div id="row">
+  <div id="chart_div" style="width: 900px; height: 500px;"></div>
+</div>
+
 <button id="update" type="button" class="btn btn-default">Update</button>
 
 <!--<p><a data-toggle="modal" href="#myModal">New budget</a></p>-->
@@ -17,11 +21,7 @@
           <tr><td>Date</td><td><input type="text" class="datepicker form-control"></input></td></tr>
           <tr><td>Name</td><td><input type="text" class="form-control"></input></td></tr>
           <tr><td>Category</td>
-            <td><select class="form-control">
-            {% for c in categories %}
-              <option value='{{c[0]}}'>{{c[1]}}</option>
-            {% endfor %}
-            </select></td>
+            <td><select class="form-control"></select></td>
            </tr>
            <tr><td>Amount</td><td><input type="text" class="form-control"></input></td></tr>
           <tr><td>Yearly</td><td><input type="checkbox" class="form-control"></input></td></tr>
@@ -44,30 +44,91 @@
       <th>Yearly</th>
     </tr>
   </thead>
-  <tbody> {% for row in table %}
-    <tr> 
-      <td><a data-toggle="modal" href="#myModal">{{ row.id }}</a></td>
-      <td><input type='text' class='datepicker form-control' value='{{ row.date }}'></input></td>
-      <td><input type='text' value='{{ row.name }}' class='form-control'></input></td>
-      <td>
-        <select class='form-control'>
-        {% for c in categories %}
-          <option value='{{c[0]}}'{% if c[0] == row.category_id %} selected{% endif %}>{{c[1]}}</option>
-        {% endfor %}
-        </select>
-      </td>
-      <td>{{ row.amount|money }}</td>
-      <td><input type='checkbox'{% if row.yearly %} checked{% endif %} class='form-control'></input></td>
-    </tr>
-    {% endfor %}
-  </tbody>
+  <tbody> </tbody>
 </table>
+
 {% endblock %}
+
 
 {% block scripts %}
   {{super()}}
+<!--http://numeraljs.com/-->
+<script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.4/numeral.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
+function categoriesInput(category_id, categories) {
+  var select = $("<select>").prop('class', 'form-control');
+  for (var i=0; i<categories.length; i++) {
+    var c = categories[i];
+    select.append(
+      $("<option>")
+        .prop({value: c[0], selected: category_id==c[0]})
+        .text(c[1])
+    );
+  }
+
+  return select;
+}
+
+var monthly_data;
+function drawVisualization() {
+  var data = google.visualization.arrayToDataTable(monthly_data);
+  var options = {seriesType: 'bars', series: {1: {type: 'line'}}};
+
+  var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+  chart.draw(data, options);
+}
+ 
 $(document).ready(function(){
+  $.get("{{url_for('transaction.rest_transactions', category_id=category_id)}}", function(data, status) {
+    monthly_data = data.monthly_data;
+
+    var modal = $("div#myModal table#transaction select");
+    for (var i=0; i<data.categories.length; i++) {
+      c = data.categories[i]
+      modal.append($("<option>").prop({value: c[0]}).text(c[1]));
+    }
+
+    var table = $("table#transactions tbody");
+    for (var i=0; i<data.transactions.length; i++) {
+      var item = data.transactions[i];
+      var row = $("<tr>")
+        .append("<td><a data-toggle='modal' href='#myModal'>"+item.id+"</a></td>")
+        .append("<td><input type='text' class='datepicker form-control' value='"+item.date+"'></input></td>")
+        .append($("<td>").append($("<input>").prop({type: 'text', class: 'form-control', value: item.name})))
+        .append(
+          $("<td>").append(categoriesInput(item.category_id, data.categories))
+        )
+        .append($("<td>").text(numeral(item.amount).format('0,0.00')))
+        .append(
+          $("<td>").append(
+            $("<input>").prop({type: 'checkbox', class: 'form-control', checked: item.yearly})
+          )
+        )
+      ;
+
+      table.append(row);
+    }
+
+    $("table#transactions tbody tr td a").click(function(){
+      var tds = $(this).parent().parent().find('td');
+      var dests = $("table#transaction tr");
+      $("h4.modal-title").text("Transaction " + $(tds[0]).find('a').text());
+      $(dests[0]).find("input").val( $(tds[1]).find('input').val() );
+      $(dests[1]).find("input").val( $(tds[2]).find('input').val() );
+      $(dests[2]).find("option").each(function(i, elem){
+        if ($(elem).attr('value') == $(tds[3]).find('select').val()) {
+          $(elem).prop('selected', true);
+        }
+      });
+      $(dests[3]).find("input").val( $(tds[4]).text() );
+      $(dests[4]).find("input").prop('checked', $(tds[5]).find('input').prop('checked'));
+    });
+
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(drawVisualization);
+ });  
+
   $('button#update').click(function(){
     var trans = [];
     $("table#transactions tbody tr").each(function(index, elem) {
@@ -93,22 +154,6 @@ $(document).ready(function(){
     );
     $(document.body).append(form);
     form.submit();
-  });
-
-
-  $("table#transactions tbody tr td a").click(function(){
-    var tds = $(this).parent().parent().find('td');
-    var dests = $("table#transaction tr");
-    $("h4.modal-title").text("Transaction " + $(tds[0]).find('a').text());
-    $(dests[0]).find("input").val( $(tds[1]).find('input').val() );
-    $(dests[1]).find("input").val( $(tds[2]).find('input').val() );
-    $(dests[2]).find("option").each(function(i, elem){
-      if ($(elem).attr('value') == $(tds[3]).find('select').val()) {
-        $(elem).prop('selected', true);
-      }
-    });
-    $(dests[3]).find("input").val( $(tds[4]).text() );
-    $(dests[4]).find("input").prop('checked', $(tds[5]).find('input').prop('checked'));
   });
 });
 </script>
