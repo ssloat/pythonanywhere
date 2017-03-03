@@ -56,7 +56,11 @@ def transactions(category_id=None):
 @transaction_bp.route('/finances/manual_entry')
 @login_required
 def manual_entry():
-    return render_template('manual_entry.html', categories=categoriesSelectBox())
+    return render_template(
+        'manual_entry.html', 
+        date=datetime.date.today().strftime('%Y-%m-%d'),
+        categories=categoriesSelectBox()
+    )
 
 
 @transaction_bp.route('/finances/upload_transactions')

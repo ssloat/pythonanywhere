@@ -7,7 +7,7 @@
       <div class="form-group">
         <label class="col-xs-3 control-label">Date</label>
         <div class="col-xs-9">
-          <input class="datepicker form-control" id="date" type="text">
+          <input class="datepicker form-control" id="date" type="text" value="{{date}}">
         </div>
       </div>
      <div class="form-group">
@@ -23,9 +23,9 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="col-xs-3 control-label">Category</label>
+        <label class="col-xs-3 control-label">Debit</label>
         <div class="col-xs-9">
-          <select class="form-control" id="category">
+          <select class="form-control" id="debit">
           {% for c in categories %}
             <option value='{{c[0]}}'>{{c[1]}}</option>
           {% endfor %}
@@ -33,9 +33,9 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="col-xs-3 control-label">Deduct</label>
+        <label class="col-xs-3 control-label">Credit</label>
         <div class="col-xs-9">
-          <select class="form-control" id="deduct">
+          <select class="form-control" id="credit">
           {% for c in categories %}
             <option value='{{c[0]}}'>{{c[1]}}</option>
           {% endfor %}
@@ -61,19 +61,19 @@ $(document).ready(function(){
       date: $('input#date').val(),
       name: $('input#name').val(),
       amount: $('input#amount').val(),
-      category_id: $('select#category').val(),
-      deduct_id: $('select#deduct').val(),
+      debit_id: $('select#debit').val(),
+      credit_id: $('select#credit').val(),
     };
     //console.log(entry);
     $.post(
       "{{url_for('transaction.rest_manual_entry')}}", 
       { entry: JSON.stringify(entry) },
       function(data, status) {
-        $("input#date").val('');
+        $("input#date").val('{{date}}');
         $("input#name").val('');
         $("input#amount").val('');
-        $("select#category").val('{{ categories[0][1] }}');
-        $("select#deduct").val('{{ categories[0][1] }}');
+        $("select#credit").val('{{ categories[0][1] }}');
+        $("select#debit").val('{{ categories[0][1] }}');
       }
     );
   });
