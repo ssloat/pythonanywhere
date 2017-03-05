@@ -56,7 +56,18 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.4/numeral.min.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
-function categoriesInput(category_id, categories) {
+var categories;
+function processCategories(data) {
+  categories = data;
+
+  var select = $("div#myModal table#transaction select");
+  select.empty();
+  for (var i=0; i<categories.length; i++) {
+    c = categories[i]
+    select.append($("<option>").prop({value: c[0]}).text(c[1]));
+  }
+}
+function categoriesInput(category_id) {
   var select = $("<select>").prop('class', 'form-control');
   for (var i=0; i<categories.length; i++) {
     var c = categories[i];
@@ -81,14 +92,6 @@ function drawVisualization() {
 
 function processTransactions(data) {
   monthly_data = data.monthly_data;
-
-  var select = $("div#myModal table#transaction select");
-  select.empty();
-  for (var i=0; i<data.categories.length; i++) {
-    c = data.categories[i]
-    select.append($("<option>").prop({value: c[0]}).text(c[1]));
-  }
-
   var table = $("table#transactions tbody");
   table.empty();
   for (var i=0; i<data.transactions.length; i++) {
@@ -132,10 +135,13 @@ function processTransactions(data) {
 
 $(document).ready(function(){
   google.charts.load('current', {'packages': ['corechart']});
-  $.get(
-    "{{url_for('transaction.rest_transactions', category_id=category_id)}}", 
-    function(data, status) { processTransactions(data); }
-  );  
+  var a1 = $.get("{{url_for('category.rest_categories_selectbox')}}");
+  var a2 = $.get("{{url_for('transaction.rest_transactions', category_id=category_id)}}"); 
+
+  $.when(a1, a2).done(function(r1, r2) {
+    processCategories(r1[0].categories);
+    processTransactions(r2[0]);
+  });
 
   $('button#m_update').click(function(){
     var trs = $(document.body).find("div.modal-body table#transaction tr");

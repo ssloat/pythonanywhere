@@ -88,9 +88,7 @@ def update_transactions():
 @transaction_bp.route('/rest/finances/transactions/<int:category_id>', methods=['GET', 'POST'])
 @login_required
 def rest_transactions(category_id):
-    results = transaction.transactions(category_id)
-    results.update({'categories': categoriesSelectBox()})
-    return jsonify(results)
+    return jsonify( transaction.transactions(category_id) )
 
 @transaction_bp.route('/rest/finances/parse_records', methods=['POST'])
 @login_required

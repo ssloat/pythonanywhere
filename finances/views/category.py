@@ -37,6 +37,12 @@ def rest_categories():
     top = db.session.query(Category).filter(Category.name=='top').first()
     return jsonify({ 'tree': [top.tree()] })
 
+@category_bp.route('/rest/finances/categories_selectbox', methods=['GET'])
+@login_required 
+def rest_categories_selectbox():
+    return jsonify({ 'categories': categoriesSelectBox() })
+
+
 @category_bp.route('/rest/finances/modify_category', methods=['POST'])
 @login_required 
 def rest_modify_category():
