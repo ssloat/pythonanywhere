@@ -184,8 +184,12 @@ def transactions(category_id, from_date=None, to_date=None):
     name = db.session.query(Category).filter(Category.id==category_id).first().name
 
     monthly_data = [ ['Month', name, 'Average'] ]
-    for k in reversed(sorted(monthly.keys())):
-        monthly_data.append([k, abs(monthly[k]), abs(avg)])
+    start = datetime.date(trans[-1].date.year, trans[-1].date.month, 1)
+    stop = datetime.date(trans[0].date.year, trans[0].date.month, 1)
+    while stop >= start:
+        k = stop.strftime('%Y/%m')
+        monthly_data.append([k, abs(monthly.get(k, 0.0)), abs(avg)])
+        stop -= relativedelta(months=1)
 
     return {
         'transactions': results, 
