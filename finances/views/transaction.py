@@ -88,8 +88,7 @@ def update_transactions():
 @transaction_bp.route('/rest/finances/transactions/<int:category_id>', methods=['GET', 'POST'])
 @login_required
 def rest_transactions(category_id):
-    from_date, to_date = _dates()
-    results = transaction.transactions(category_id, from_date, to_date)
+    results = transaction.transactions(category_id)
     results.update({'categories': categoriesSelectBox()})
     return jsonify(results)
 
@@ -104,11 +103,11 @@ def rest_upload_transactions():
     transaction.save_transactions( current_user.id, json.loads(request.form['transactions']) )
     return jsonify({'results': 'success'})
 
-@transaction_bp.route('/rest/finances/update_transactions', methods=['POST'])
+@transaction_bp.route('/rest/finances/update_transaction/<int:category_id>', methods=['POST'])
 @login_required
-def rest_update_transactions():
-    transaction.update_transactions( json.loads(request.form['transactions']) )
-    return jsonify({'results': 'success'})
+def rest_update_transaction(category_id):
+    transaction.update_transactions([ request.form ])
+    return rest_transactions(category_id)
 
 @transaction_bp.route('/rest/finances/manual_entry', methods=['POST'])
 @login_required
