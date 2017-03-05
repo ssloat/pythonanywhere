@@ -156,13 +156,13 @@ def monthly_breakdown(from_date, to_date):
 
     return table
 
-def transactions(category_id, from_date, to_date):
+def transactions(category_id, from_date=None, to_date=None):
     trans = db.session.query(Transaction).join(Category).filter(
         Category.id.in_(
             [category_id] + [c.id for c in allChildren(category_id)]
         ),
-        Transaction.date>=from_date,
-        Transaction.date<=to_date,
+#        Transaction.date>=from_date,
+#        Transaction.date<=to_date,
     ).order_by(Transaction.date.desc()).all()
 
     results = []
@@ -174,9 +174,11 @@ def transactions(category_id, from_date, to_date):
             'name': tran.name,
             'category_id': tran.category_id,
             'amount': tran.amount,
+            'yearly': tran.yearly,
         })
 
-        monthly[tran.date.strftime('%Y/%m')] += tran.amount
+        if not tran.yearly:
+            monthly[tran.date.strftime('%Y/%m')] += tran.amount
 
     avg = float(sum(monthly.values())) / len(monthly.values())
     name = db.session.query(Category).filter(Category.id==category_id).first().name
@@ -198,7 +200,7 @@ def update_transactions(transactions):
         t.date = datetime.date(*[int(x) for x in transaction['date'].split('-')])
         t.name = transaction['name']
         t.category_id = int(transaction['category_id'])
-        t.yearly = transaction['yearly']
+        t.yearly = transaction['yearly'].lower() == 'true'
 
         db.session.add(t)
 
