@@ -18,13 +18,13 @@
       </div>
       <div class="modal-body">
         <table id="transaction" class="table table-striped">
+          <tr><td>ID</td><td><input type="text" class="form-control"></input></td></tr>
           <tr><td>Date</td><td><input type="text" class="datepicker form-control"></input></td></tr>
           <tr><td>Name</td><td><input type="text" class="form-control"></input></td></tr>
-          <tr><td>Category</td>
-            <td><select class="form-control"></select></td>
-           </tr>
-           <tr><td>Amount</td><td><input type="text" class="form-control"></input></td></tr>
+          <tr><td>Category</td><td><select class="form-control"></select></td></tr>
+          <tr><td>Amount</td><td><input type="text" class="form-control"></input></td></tr>
           <tr><td>Yearly</td><td><input type="checkbox" class="form-control"></input></td></tr>
+          <tr><td></td><td><button type="button" id="m_update" class="btn btn-default">Update</button></td></tr>
         </table>
       </div>
     </div>
@@ -78,56 +78,84 @@ function drawVisualization() {
   var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
   chart.draw(data, options);
 }
- 
-$(document).ready(function(){
-  $.get("{{url_for('transaction.rest_transactions', category_id=category_id)}}", function(data, status) {
-    monthly_data = data.monthly_data;
 
-    var modal = $("div#myModal table#transaction select");
-    for (var i=0; i<data.categories.length; i++) {
-      c = data.categories[i]
-      modal.append($("<option>").prop({value: c[0]}).text(c[1]));
-    }
+function processTransactions(data) {
+  monthly_data = data.monthly_data;
 
-    var table = $("table#transactions tbody");
-    for (var i=0; i<data.transactions.length; i++) {
-      var item = data.transactions[i];
-      var row = $("<tr>")
-        .append("<td><a data-toggle='modal' href='#myModal'>"+item.id+"</a></td>")
-        .append("<td><input type='text' class='datepicker form-control' value='"+item.date+"'></input></td>")
-        .append($("<td>").append($("<input>").prop({type: 'text', class: 'form-control', value: item.name})))
-        .append(
-          $("<td>").append(categoriesInput(item.category_id, data.categories))
+  var select = $("div#myModal table#transaction select");
+  select.empty();
+  for (var i=0; i<data.categories.length; i++) {
+    c = data.categories[i]
+    select.append($("<option>").prop({value: c[0]}).text(c[1]));
+  }
+
+  var table = $("table#transactions tbody");
+  table.empty();
+  for (var i=0; i<data.transactions.length; i++) {
+    var item = data.transactions[i];
+    var row = $("<tr>")
+      .append("<td><a data-toggle='modal' href='#myModal'>"+item.id+"</a></td>")
+      .append("<td><input type='text' class='datepicker form-control' value='"+item.date+"'></input></td>")
+      .append($("<td>").append($("<input>").prop({type: 'text', class: 'form-control', value: item.name})))
+      .append(
+        $("<td>").append(categoriesInput(item.category_id, data.categories))
+      )
+      .append($("<td>").text(numeral(item.amount).format('0,0.00')))
+      .append(
+        $("<td>").append(
+          $("<input>").prop({type: 'checkbox', class: 'form-control', checked: item.yearly})
         )
-        .append($("<td>").text(numeral(item.amount).format('0,0.00')))
-        .append(
-          $("<td>").append(
-            $("<input>").prop({type: 'checkbox', class: 'form-control', checked: item.yearly})
-          )
-        )
-      ;
+      )
+    ;
 
-      table.append(row);
-    }
+    table.append(row);
+  }
 
-    $("table#transactions tbody tr td a").click(function(){
-      var tds = $(this).parent().parent().find('td');
-      var dests = $("table#transaction tr");
-      $("h4.modal-title").text("Transaction " + $(tds[0]).find('a').text());
-      $(dests[0]).find("input").val( $(tds[1]).find('input').val() );
-      $(dests[1]).find("input").val( $(tds[2]).find('input').val() );
-      $(dests[2]).find("option").each(function(i, elem){
-        if ($(elem).attr('value') == $(tds[3]).find('select').val()) {
-          $(elem).prop('selected', true);
-        }
-      });
-      $(dests[3]).find("input").val( $(tds[4]).text() );
-      $(dests[4]).find("input").prop('checked', $(tds[5]).find('input').prop('checked'));
+  $("table#transactions tbody tr td a").click(function(){
+    var tds = $(this).parent().parent().find('td');
+    var dests = $("table#transaction tr");
+    $("h4.modal-title").text("Transaction " + $(tds[0]).find('a').text());
+    $(dests[0]).find("input").val( $(tds[0]).find('a').text() );
+    $(dests[1]).find("input").val( $(tds[1]).find('input').val() );
+    $(dests[2]).find("input").val( $(tds[2]).find('input').val() );
+    $(dests[3]).find("option").each(function(i, elem){
+      if ($(elem).attr('value') == $(tds[3]).find('select').val()) {
+        $(elem).prop('selected', true);
+      }
     });
+    $(dests[4]).find("input").val( $(tds[4]).text() );
+    $(dests[5]).find("input").prop('checked', $(tds[5]).find('input').prop('checked'));
+  });
 
-    google.charts.load('current', {'packages': ['corechart']});
-    google.charts.setOnLoadCallback(drawVisualization);
- });  
+  google.charts.setOnLoadCallback(drawVisualization);
+}
+
+$(document).ready(function(){
+  google.charts.load('current', {'packages': ['corechart']});
+  $.get(
+    "{{url_for('transaction.rest_transactions', category_id=category_id)}}", 
+    function(data, status) { processTransactions(data); }
+  );  
+
+  $('button#m_update').click(function(){
+    var trs = $(document.body).find("div.modal-body table#transaction tr");
+    $.post(
+      "{{url_for('transaction.rest_update_transaction', category_id=category_id)}}", 
+      {
+        'id': $(trs[0]).find('input').val(),
+        'date': $(trs[1]).find('input').val(),
+        'name': $(trs[2]).find('input').val(),
+        'category_id': $(trs[3]).find('select').val(),
+        'amount': $(trs[4]).find('input').val(), 
+        'yearly': $(trs[5]).find('input').prop('checked')
+      },
+      function(data, status) {
+        processTransactions(data);
+        $('div#myModal').modal('hide');
+      }
+    );
+  });
+
 
   $('button#update').click(function(){
     var trans = [];
@@ -142,7 +170,6 @@ $(document).ready(function(){
         yearly: $(tds[5]).find('input').prop('checked'),
       });
     });
-
     var form = $('<form></form>');
     form.attr({method: "post", action: "{{url_for('transaction.update_transactions')}}"});
     form.append(
