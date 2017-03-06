@@ -14,7 +14,7 @@ transaction_bp = Blueprint(
     __name__, 
     template_folder='../templates',
     static_folder='../static',
-    static_url_path='/static/finances',
+    static_url_path='/static/transaction',
 )
 
 @transaction_bp.app_template_filter('money')
@@ -105,6 +105,13 @@ def rest_upload_transactions():
 @login_required
 def rest_update_transaction(category_id):
     transaction.update_transactions([ request.form ])
+    return rest_transactions(category_id)
+
+@transaction_bp.route('/rest/finances/split_transaction/<int:category_id>', methods=['POST'])
+@login_required
+def rest_split_transaction(category_id):
+    print request.form
+    #transaction.split_transactions([ request.form ])
     return rest_transactions(category_id)
 
 @transaction_bp.route('/rest/finances/manual_entry', methods=['POST'])
