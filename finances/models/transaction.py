@@ -233,3 +233,28 @@ def add_manual_entry(user_id, entry):
 
     db.session.commit()
 
+def split_transaction(user_id, data):
+    curr = db.session.query(Transaction).filter(
+        Transaction.id==int(data['curr_id']),
+        Transaction.user_id==user_id,
+    ).first()
+
+    curr.date = datetime.date(*[int(x) for x in data['curr_date'].split('-')])
+    curr.name = data['curr_name']
+    curr.category_id = int(data['curr_category_id'])
+    curr.amount = float(data['curr_amount'])
+    curr.yearly = data['curr_yearly'].lower() == 'true'
+
+    new = Transaction(
+        user=user_id,
+        date=datetime.date(*[int(x) for x in data['new_date'].split('-')]),
+        name=data['new_name'],
+        category=int(data['new_category_id']),
+        amount=float(data['new_amount']),
+        yearly=data['new_yearly'].lower() == 'true',
+        record_id=curr.record_id,
+    )
+
+    db.session.add_all([curr, new])
+    db.session.commit()
+ 

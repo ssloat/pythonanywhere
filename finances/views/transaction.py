@@ -110,8 +110,7 @@ def rest_update_transaction(category_id):
 @transaction_bp.route('/rest/finances/split_transaction/<int:category_id>', methods=['POST'])
 @login_required
 def rest_split_transaction(category_id):
-    print request.form
-    #transaction.split_transactions([ request.form ])
+    transaction.split_transaction(current_user.id, request.form)
     return rest_transactions(category_id)
 
 @transaction_bp.route('/rest/finances/manual_entry', methods=['POST'])

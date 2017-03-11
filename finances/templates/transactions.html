@@ -48,6 +48,7 @@
       </div>
       <div class="modal-body">
         <input type="hidden" class="form-control" id="tid"></input>
+        <input type="hidden" class="form-control" id="ms_amount"></input>
         <table id="transaction" class="table table-striped">
           <tr>
             <td>Date</td>
@@ -64,7 +65,7 @@
             <td><select class="form-control"></select></td>
             <td><select class="form-control"></select></td>
           </tr>
-          <tr>
+          <tr id='amounts'>
             <td>Amount</td>
             <td><input type="text" class="form-control"></input></td>
             <td><input type="text" class="form-control"></input></td>
@@ -121,9 +122,19 @@ $(document).ready(function(){
     processTransactions(r2[0]);
   });
 
-  $('button#em_update').click(editModal_update);
+  $('button#em_update').click(function(){
+    editModal_update(
+      "{{url_for('transaction.rest_update_transaction', category_id=category_id)}}"
+    )
+  });
+
   $('button#em_split').click(editModal_split);
-  $('button#sm_update').click(splitModal_update);
+  $('button#sm_update').click(function(){
+    splitModal_update(
+      "{{url_for('transaction.rest_split_transaction', category_id=category_id)}}"
+    );
+  });
+  $('div#modalSplit table tr#amounts input').change(splitModal_change);
 
   $('button#update').click(function(){
     var trans = [];

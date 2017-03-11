@@ -1,3 +1,4 @@
+
 var categories;
 function processCategories(data) {
   categories = data;
@@ -75,10 +76,10 @@ function processTransactions(data) {
   google.charts.setOnLoadCallback(drawVisualization);
 }
 
-function editModal_update() {
+function editModal_update(url) {
   var trs = $(document.body).find("div#modalEdit table#transaction tr");
   $.post(
-    "{{url_for('transaction.rest_update_transaction', category_id=category_id)}}", 
+    url,
     {
       'id': $("div#modalEdit input#tid").val(),
       'date': $(trs[1]).find('input').val(),
@@ -96,48 +97,59 @@ function editModal_update() {
 
 function editModal_split() {
   var trs = $(document.body).find("div#modalEdit table#transaction tr");
+  var date = $(trs[0]).find('input').val();
+  var name = $(trs[1]).find('input').val();
+  var category_id = $(trs[2]).find('select').val();
+  var amount = $(trs[3]).find('input').val();
+  var yearly = $(trs[4]).find('input').prop('checked');
+
   var dests = $("div#modalSplit table#transaction tr");
   var tid = $("div#modalEdit input#tid").val(); 
+
   $("div#modalSplit h4.modal-title").text("Split Transaction " + tid);
   $("div#modalSplit input#tid").val(tid);
-  $(dests[0]).find("input").val( $(trs[0]).find('input').val() );
-  $(dests[1]).find("input").first().val( $(trs[1]).find('input').val() );
+  $("div#modalSplit input#ms_amount").val(amount);
+
+  $(dests[0]).find("input").val( date );
+  $(dests[1]).find("input").first().val( name );
   $(dests[2]).find("select").first().find("option").each(function(i, elem){
-    if ($(elem).attr('value') == $(trs[2]).find('select').val()) {
+    if ($(elem).attr('value') == category_id) {
       $(elem).prop('selected', true);
     }
   });
-  $(dests[3]).find("input").first().val( $(trs[3]).find('input').val() );
-  $(dests[4]).find("input").first().prop('checked', $(trs[4]).find('input').prop('checked'));
+  $(dests[3]).find("input").first().val( amount );
+  $(dests[4]).find("input").first().prop('checked', yearly);
 
   $('div#modalEdit').modal('hide');
   $('div#modalSplit').modal('show');
 } 
 
-function splitModal_update() {
+function splitModal_update(url) {
   var trs = $(document.body).find("div#modalSplit table#transaction tr");
-  $.post(
-    "{{url_for('transaction.rest_split_transaction', category_id=category_id)}}", 
-    {
-      'curr': {
-        'id': $("div#modalSplit input#tid").val(),  
-        'date': $(trs[0]).find('input').first().val(),
-        'name': $(trs[1]).find('input').first().val(),
-        'category_id': $(trs[2]).find('select').first().val(),
-        'amount': $(trs[3]).find('input').first().val(), 
-        'yearly': $(trs[4]).find('input').first().prop('checked')
-      },
-      'new': {
-        'date': $(trs[0]).find('input').last().val(),
-        'name': $(trs[1]).find('input').last().val(),
-        'category_id': $(trs[2]).find('select').last().val(),
-        'amount': $(trs[3]).find('input').last().val(), 
-        'yearly': $(trs[4]).find('input').last().prop('checked')
-       }
-    },
-    function(data, status) {
-      processTransactions(data);
-      $('div#modalSplit').modal('hide');
-    }
-  );
+  var data = {
+    'curr_id': $("div#modalSplit input#tid").val(),  
+    'curr_date': $(trs[0]).find('input').first().val(),
+    'curr_name': $(trs[1]).find('input').first().val(),
+    'curr_category_id': $(trs[2]).find('select').first().val(),
+    'curr_amount': $(trs[3]).find('input').first().val(), 
+    'curr_yearly': $(trs[4]).find('input').first().prop('checked'),
+
+    'new_date': $(trs[0]).find('input').last().val(),
+    'new_name': $(trs[1]).find('input').last().val(),
+    'new_category_id': $(trs[2]).find('select').last().val(),
+    'new_amount': $(trs[3]).find('input').last().val(), 
+    'new_yearly': $(trs[4]).find('input').last().prop('checked')
+  };
+  $.post(url, data, function(data, status) {
+    processTransactions(data);
+    $('div#modalSplit').modal('hide');
+  });
 } 
+
+function splitModal_change() {
+  var amount = parseFloat($("div#modalSplit input#ms_amount").val().replace(/,/g, ''));
+  var sib_amount = amount - parseFloat($(this).val());
+
+  $(this).parent().siblings().find("input").val(sib_amount);
+}
+
