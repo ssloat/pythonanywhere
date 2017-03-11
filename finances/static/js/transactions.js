@@ -77,16 +77,24 @@ function processTransactions(data) {
 }
 
 function editModal_update(url) {
+  var tid = $("div#modalEdit input#tid").val(); 
+
   var trs = $(document.body).find("div#modalEdit table#transaction tr");
+  var date = $(trs[0]).find('input').val();
+  var name = $(trs[1]).find('input').val();
+  var category_id = $(trs[2]).find('select').val();
+  var amount = $(trs[3]).find('input').val();
+  var yearly = $(trs[4]).find('input').prop('checked');
+
   $.post(
     url,
     {
-      'id': $("div#modalEdit input#tid").val(),
-      'date': $(trs[1]).find('input').val(),
-      'name': $(trs[2]).find('input').val(),
-      'category_id': $(trs[3]).find('select').val(),
-      'amount': $(trs[4]).find('input').val(), 
-      'yearly': $(trs[5]).find('input').prop('checked')
+      'id': tid,
+      'date': date,
+      'name': name,
+      'category_id': category_id,
+      'amount': amount,
+      'yearly': yearly,
     },
     function(data, status) {
       processTransactions(data);
