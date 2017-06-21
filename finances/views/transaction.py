@@ -1,6 +1,5 @@
 from mysite import db
 from finances.models import transaction
-from finances.models.category import categoriesSelectBox
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, session
 from flask_login import current_user, login_required
@@ -46,27 +45,18 @@ def _dates():
 @transaction_bp.route('/finances/transactions/<int:category_id>')
 @login_required
 def transactions(category_id=None):
-    return render_template(
-        'transactions.html', 
-        #table=transaction.transactions(category_id),
-        category_id=category_id,
-        #categories=categoriesSelectBox(),
-    )
+    return render_template('transactions.html', category_id=category_id)
 
 @transaction_bp.route('/finances/manual_entry')
 @login_required
 def manual_entry():
-    return render_template(
-        'manual_entry.html', 
-        date=datetime.date.today().strftime('%Y-%m-%d'),
-        categories=categoriesSelectBox()
-    )
+    return render_template('manual_entry.html', date=str(datetime.date.today()))
 
 
 @transaction_bp.route('/finances/upload_transactions')
 @login_required
 def upload_transactions():
-    return render_template('upload_transactions.html', categories=categoriesSelectBox())
+    return render_template('upload_transactions.html')
 
 @transaction_bp.route('/finances/monthly_breakdown')
 @login_required
@@ -93,7 +83,7 @@ def rest_transactions(category_id):
 @transaction_bp.route('/rest/finances/parse_records', methods=['POST'])
 @login_required
 def rest_parse_records():
-    return jsonify({'transactions': transaction.parse_ofx(request.form['text'])})
+    return jsonify(transaction.parse_ofx(current_user.id, request.form['text']))
 
 @transaction_bp.route('/rest/finances/upload_transactions', methods=['POST'])
 @login_required
