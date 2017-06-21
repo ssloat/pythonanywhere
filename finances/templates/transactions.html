@@ -5,8 +5,6 @@
   <div id="chart_div" style="width: 900px; height: 500px;"></div>
 </div>
 
-<button id="update" type="button" class="btn btn-default">Update</button>
-
 <div id="modalEdit" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
@@ -16,21 +14,45 @@
         <h4 class="modal-title"></h4>
       </div>
       <div class="modal-body">
-        <input type="hidden" class="form-control" id="tid"></input>
-        <table id="transaction" class="table table-striped">
-          <tr><td>Date</td><td><input type="text" class="datepicker form-control"></input></td></tr>
-          <tr><td>Name</td><td><input type="text" class="form-control"></input></td></tr>
-          <tr><td>Category</td><td><select class="form-control"></select></td></tr>
-          <tr><td>Amount</td><td><input type="text" class="form-control"></input></td></tr>
-          <tr><td>Yearly</td><td><input type="checkbox" class="form-control"></input></td></tr>
-          <tr>
-            <td></td>
-            <td>
-              <button type="button" id="em_update" class="btn btn-default">Update</button>
-              <button type="button" id="em_split" class="btn btn-default">Split</button>
-            </td>
-          </tr>
-        </table>
+        <input type="hidden" class="form-control" id="tid">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="me_date">Date:</label>
+            <div class="col-sm-10">
+              <input type="text" class="datepicker form-control" id="me_date">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="me_name">Name:</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="me_name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="me_category">Category:</label>
+            <div class="col-sm-10">
+              <select class="form-control" id="me_category"></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="me_amount">Amount:</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="me_amount">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="me_yearly">Yearly:</label>
+            <div class="col-sm-10">
+              <input type="checkbox" class="form-control" id="me_yearly">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="button" id="me_update" class="btn btn-default">Update</button>
+              <button type="button" id="me_split" class="btn btn-default">Split</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -48,45 +70,44 @@
       </div>
       <div class="modal-body">
         <input type="hidden" class="form-control" id="tid"></input>
-        <input type="hidden" class="form-control" id="ms_amount"></input>
-        <table id="transaction" class="table table-striped">
-          <tr>
-            <td>Date</td>
-            <td><input type="text" class="datepicker form-control"></input></td>
-            <td><input type="text" class="datepicker form-control"></input></td>
-          </tr>
-          <tr>
-            <td>Name</td>
-            <td><input type="text" class="form-control"></input></td>
-            <td><input type="text" class="form-control"></input></td>
-          </tr>
-          <tr>
-            <td>Category</td>
-            <td><select class="form-control"></select></td>
-            <td><select class="form-control"></select></td>
-          </tr>
-          <tr id='amounts'>
-            <td>Amount</td>
-            <td><input type="text" class="form-control"></input></td>
-            <td><input type="text" class="form-control"></input></td>
-          </tr>
-          <tr>
-            <td>Yearly</td>
-            <td><input type="checkbox" class="form-control"></input></td>
-            <td><input type="checkbox" class="form-control"></input></td>
-          </tr>
-          <tr>
-            <td align="center" colspan="3">
-              <button type="button" id="sm_update" class="btn btn-default">Update</button>
-            </td>
-          </tr>
-        </table>
+        <input type="hidden" class="form-control" id="ms_total"></input>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="ms_date">Date:</label>
+            <div class="col-sm-5"> <input type="text" class="datepicker form-control" id="ms_date"> </div>
+            <div class="col-sm-5"> <input type="text" class="datepicker form-control" id="ms_date2"> </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="ms_name">Name:</label>
+            <div class="col-sm-5"> <input type="text" class="form-control" id="ms_name"> </div>
+            <div class="col-sm-5"> <input type="text" class="form-control" id="ms_name2"> </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="ms_category">Category:</label>
+            <div class="col-sm-5"> <select class="form-control" id="ms_category"></select> </div>
+            <div class="col-sm-5"> <select class="form-control" id="ms_category2"></select> </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="ms_amount">Amount:</label>
+            <div class="col-sm-5"> <input type="text" class="form-control" id="ms_amount"> </div>
+            <div class="col-sm-5"> <input type="text" class="form-control" id="ms_amount2"> </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="ms_yearly">Yearly:</label>
+            <div class="col-sm-5"> <input type="checkbox" class="form-control" id="ms_yearly"> </div>
+            <div class="col-sm-5"> <input type="checkbox" class="form-control" id="ms_yearly2"> </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <button type="button" id="ms_update" class="btn btn-default">Update</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
 
   </div>
 </div>
-
 
 <table id="transactions" class="table table-striped">
   <thead>
@@ -110,6 +131,7 @@
 <!--http://numeraljs.com/-->
 <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.4/numeral.min.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="{{url_for('transaction.static', filename='js/categories.js')}}"></script>
 <script src="{{url_for('transaction.static', filename='js/transactions.js')}}"></script>
 <script>
 $(document).ready(function(){
@@ -118,49 +140,26 @@ $(document).ready(function(){
   var a2 = $.get("{{url_for('transaction.rest_transactions', category_id=category_id)}}"); 
 
   $.when(a1, a2).done(function(r1, r2) {
-    processCategories(r1[0].categories);
+    categories = r1[0].categories;
+    addCategoryOptions($("div.modal select"));
     processTransactions(r2[0]);
   });
 
-  $('button#em_update').click(function(){
-    editModal_update(
+  $('button#me_update').click(function(){
+    EditModal_update(
       "{{url_for('transaction.rest_update_transaction', category_id=category_id)}}"
     )
   });
 
-  $('button#em_split').click(editModal_split);
+  $('button#me_split').click(EditModal_split);
   $('button#sm_update').click(function(){
     splitModal_update(
       "{{url_for('transaction.rest_split_transaction', category_id=category_id)}}"
     );
   });
-  $('div#modalSplit table tr#amounts input').change(splitModal_change);
+  $('div#modalSplit input#ms_amount').change(splitModal_change);
+  $('div#modalSplit input#ms_amount2').change(splitModal_change);
 
-  $('button#update').click(function(){
-    var trans = [];
-    $("table#transactions tbody tr").each(function(index, elem) {
-      var tds = $(this).find('td')
-      trans.push({
-        id: $(tds[0]).text(),
-        date: $(tds[1]).find('input').val(),
-        name: $(tds[2]).find('input').val(),
-        category_id: $(tds[3]).find('select').val(),
-        amount: $(tds[4]).text(),
-        yearly: $(tds[5]).find('input').prop('checked'),
-      });
-    });
-    var form = $('<form></form>');
-    form.attr({method: "post", action: "{{url_for('transaction.update_transactions')}}"});
-    form.append(
-      $('<input></input>').attr({
-        type: "hidden",
-        name: "transactions",
-        value: JSON.stringify(trans),
-      })
-    );
-    $(document.body).append(form);
-    form.submit();
-  });
 });
 </script>
 {% endblock %}
