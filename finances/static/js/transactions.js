@@ -1,29 +1,4 @@
 
-var categories;
-function processCategories(data) {
-  categories = data;
-
-  var select = $("div.modal table#transaction select");
-  select.empty();
-  for (var i=0; i<categories.length; i++) {
-    c = categories[i]
-    select.append($("<option>").prop({value: c[0]}).text(c[1]));
-  }
-}
-function categoriesInput(category_id) {
-  var select = $("<select>").prop('class', 'form-control');
-  for (var i=0; i<categories.length; i++) {
-    var c = categories[i];
-    select.append(
-      $("<option>")
-        .prop({value: c[0], selected: category_id==c[0]})
-        .text(c[1])
-    );
-  }
-
-  return select;
-}
-
 var monthly_data;
 function drawVisualization() {
   var data = google.visualization.arrayToDataTable(monthly_data);
@@ -41,15 +16,22 @@ function processTransactions(data) {
     var item = data.transactions[i];
     var row = $("<tr>")
       .append("<td><a data-toggle='modal' href='#modalEdit'>"+item.id+"</a></td>")
-      .append("<td><input type='text' class='datepicker form-control' value='"+item.date+"'></input></td>")
-      .append($("<td>").append($("<input>").prop({type: 'text', class: 'form-control', value: item.name})))
+      .append($("<td>").text(item.date))
+      .append($("<td>").text(item.name))
       .append(
-        $("<td>").append(categoriesInput(item.category_id, data.categories))
+        $("<td>").append( 
+          addCategoryOptions(
+            $("<select>").prop({class: 'form-control'}).attr({disabled: true}), 
+            item.category_id
+          )
+        )
       )
       .append($("<td>").text(numeral(item.amount).format('0,0.00')))
       .append(
         $("<td>").append(
-          $("<input>").prop({type: 'checkbox', class: 'form-control', checked: item.yearly})
+          $("<input>")
+            .prop({type: 'checkbox', class: 'form-control', checked: item.yearly})
+            .attr({disabled: true})
         )
       )
     ;
@@ -59,33 +41,31 @@ function processTransactions(data) {
 
   $("table#transactions tbody tr td a").click(function(){
     var tds = $(this).parent().parent().find('td');
-    var dests = $("div#modalEdit table#transaction tr");
     $("div#modalEdit h4.modal-title").text("Transaction " + $(tds[0]).find('a').text());
     $("div#modalEdit input#tid").val( $(tds[0]).find('a').text() );
-    $(dests[0]).find("input").val( $(tds[1]).find('input').val() );
-    $(dests[1]).find("input").val( $(tds[2]).find('input').val() );
-    $(dests[2]).find("option").each(function(i, elem){
+    $("input#me_date").val( $(tds[1]).text() );
+    $("input#me_name").val( $(tds[2]).text() );
+    $("select#me_category option").each(function(i, elem){
       if ($(elem).attr('value') == $(tds[3]).find('select').val()) {
         $(elem).prop('selected', true);
       }
     });
-    $(dests[3]).find("input").val( $(tds[4]).text() );
-    $(dests[4]).find("input").prop('checked', $(tds[5]).find('input').prop('checked'));
+    $("input#me_amount").val( $(tds[4]).text() );
+    $("input#me_yearly").prop('checked', $(tds[5]).find('input').prop('checked'));
   });
 
   google.charts.setOnLoadCallback(drawVisualization);
 }
 
-function editModal_update(url) {
+function EditModal_update(url) {
   var tid = $("div#modalEdit input#tid").val(); 
 
-  var trs = $(document.body).find("div#modalEdit table#transaction tr");
-  var date = $(trs[0]).find('input').val();
-  var name = $(trs[1]).find('input').val();
-  var category_id = $(trs[2]).find('select').val();
-  var amount = $(trs[3]).find('input').val();
-  var yearly = $(trs[4]).find('input').prop('checked');
-
+  var date = $("input#me_date").val();
+  var name = $("input#me_name").val();
+  var category_id = $("select#me_category").val();
+  var amount = $("input#me_amount").val();
+  var yearly = $("input#me_yearly").prop('checked');
+  
   $.post(
     url,
     {
@@ -101,52 +81,46 @@ function editModal_update(url) {
       $('div#modalEdit').modal('hide');
     }
   );
-} 
+}
 
-function editModal_split() {
-  var trs = $(document.body).find("div#modalEdit table#transaction tr");
-  var date = $(trs[0]).find('input').val();
-  var name = $(trs[1]).find('input').val();
-  var category_id = $(trs[2]).find('select').val();
-  var amount = $(trs[3]).find('input').val();
-  var yearly = $(trs[4]).find('input').prop('checked');
-
-  var dests = $("div#modalSplit table#transaction tr");
+function EditModal_split() {
+  var amount = $("input#me_amount").val();
+  var category_id = $("select#me_category").val();
   var tid = $("div#modalEdit input#tid").val(); 
 
   $("div#modalSplit h4.modal-title").text("Split Transaction " + tid);
   $("div#modalSplit input#tid").val(tid);
-  $("div#modalSplit input#ms_amount").val(amount);
+  $("div#modalSplit input#ms_total").val(amount);
 
-  $(dests[0]).find("input").val( date );
-  $(dests[1]).find("input").first().val( name );
-  $(dests[2]).find("select").first().find("option").each(function(i, elem){
+  $("input#ms_date").val( $("input#me_date").val() );
+  $("input#ms_date2").val( $("input#me_date").val() );
+  $("input#ms_name").val( $("input#me_name").val() );
+  $("select#ms_category").find("option").each(function(i, elem){
     if ($(elem).attr('value') == category_id) {
       $(elem).prop('selected', true);
     }
   });
-  $(dests[3]).find("input").first().val( amount );
-  $(dests[4]).find("input").first().prop('checked', yearly);
+  $("input#ms_amount").val( amount );
+  $("input#ms_yearly").prop('checked', $("input#me_yearly").prop('checked'));
 
   $('div#modalEdit').modal('hide');
   $('div#modalSplit').modal('show');
 } 
 
 function splitModal_update(url) {
-  var trs = $(document.body).find("div#modalSplit table#transaction tr");
   var data = {
     'curr_id': $("div#modalSplit input#tid").val(),  
-    'curr_date': $(trs[0]).find('input').first().val(),
-    'curr_name': $(trs[1]).find('input').first().val(),
-    'curr_category_id': $(trs[2]).find('select').first().val(),
-    'curr_amount': $(trs[3]).find('input').first().val(), 
-    'curr_yearly': $(trs[4]).find('input').first().prop('checked'),
+    'curr_date': $("input#ms_date").val(), 
+    'curr_name': $("input#ms_name").val(), 
+    'curr_category_id': $("select#ms_category").val(), 
+    'curr_amount': $("input#ms_amount").val(),  
+    'curr_yearly': $("input#ms_yearly").prop('checked'),  
 
-    'new_date': $(trs[0]).find('input').last().val(),
-    'new_name': $(trs[1]).find('input').last().val(),
-    'new_category_id': $(trs[2]).find('select').last().val(),
-    'new_amount': $(trs[3]).find('input').last().val(), 
-    'new_yearly': $(trs[4]).find('input').last().prop('checked')
+    'new_date': $("input#ms_date2").val(), 
+    'new_name': $("input#ms_name2").val(), 
+    'new_category_id': $("select#ms_category2").val(), 
+    'new_amount': $("input#ms_amount2").val(),  
+    'new_yearly': $("input#ms_yearly2").prop('checked')
   };
   $.post(url, data, function(data, status) {
     processTransactions(data);
@@ -155,7 +129,7 @@ function splitModal_update(url) {
 } 
 
 function splitModal_change() {
-  var amount = parseFloat($("div#modalSplit input#ms_amount").val().replace(/,/g, ''));
+  var amount = parseFloat($("div#modalSplit input#ms_total").val().replace(/,/g, ''));
   var sib_amount = amount - parseFloat($(this).val());
 
   $(this).parent().siblings().find("input").val(sib_amount);
