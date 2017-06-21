@@ -37,6 +37,7 @@ def create_app(obj=None):
     app.register_blueprint(finances.views.pattern.pattern_bp)
     app.register_blueprint(finances.views.category.category_bp)
     app.register_blueprint(investments.views.portfolio.portfolio_bp)
+    app.register_blueprint(investments.views.assets.asset_bp)
     app.register_blueprint(mysite.user.views.user_bp)
 
     Bootstrap(app)
