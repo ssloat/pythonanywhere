@@ -1,6 +1,6 @@
 import logging
 
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 
 from mysite import create_app, db
 from mysite.user.models import User
@@ -17,7 +17,7 @@ class TestBase(TestCase):
         logging.basicConfig(level=logging.ERROR)
         db.create_all()
 
-        self.user = User(id=1, email='user@host.com', name='test') 
+        self.user = User(id=1, email='user@host.com', name='test', first_name='test', last_name='test') 
         db.session.add(self.user)
 
     def tearDown(self):

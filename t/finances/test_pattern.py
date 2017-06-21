@@ -42,7 +42,7 @@ class TestPattern(TestBase):
         rec = Record(id=1, date=datetime.date(2016, 6, 30), payee='pattern', amount=1.23)
 
         pattern = db.session.query(Pattern).first()
-        assert_equals(pattern.match(rec), True)
+        assert_equals(pattern.match(self.user, rec), True)
 
         expected = [
             {
@@ -75,6 +75,6 @@ class TestPattern(TestBase):
             },
         ]
     
-        assert_equals(pattern.transactions(rec), expected)
+        assert_equals([t.json() for t in pattern.transactions(self.user, rec)], expected)
 
 
