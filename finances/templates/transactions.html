@@ -16,36 +16,24 @@
       <div class="modal-body">
         <input type="hidden" class="form-control" id="tid">
         <form class="form-horizontal">
+{% macro me_input(id, type='text', class='form-control') -%}
           <div class="form-group">
-            <label class="control-label col-sm-2" for="me_date">Date:</label>
+            <label class="control-label col-sm-2" for="me_{{id}}">{{id|capitalize}}:</label>
             <div class="col-sm-10">
-              <input type="text" class="datepicker form-control" id="me_date">
+              <input type="{{type}}" class="{{class}}" id="me_{{id}}"></input>
             </div>
           </div>
+{%- endmacro %}
+          {{ me_input('date', class='datepicker form-control') }}
+          {{ me_input('name') }}
           <div class="form-group">
-            <label class="control-label col-sm-2" for="me_name">Name:</label>
+            <label class="control-label col-sm-2" for="me_Category">Category:</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" id="me_name">
+              <select class="form-control" id="me_Category"></select>
             </div>
           </div>
-          <div class="form-group">
-            <label class="control-label col-sm-2" for="me_category">Category:</label>
-            <div class="col-sm-10">
-              <select class="form-control" id="me_category"></select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-sm-2" for="me_amount">Amount:</label>
-            <div class="col-sm-10">
-              <input type="text" class="form-control" id="me_amount">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-sm-2" for="me_yearly">Yearly:</label>
-            <div class="col-sm-10">
-              <input type="checkbox" class="form-control" id="me_yearly">
-            </div>
-          </div>
+          {{ me_input('amount') }}
+          {{ me_input('yearly', type='checkbox') }}
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
               <button type="button" id="me_update" class="btn btn-default">Update</button>
@@ -70,33 +58,24 @@
       </div>
       <div class="modal-body">
         <input type="hidden" class="form-control" id="tid"></input>
-        <input type="hidden" class="form-control" id="ms_total"></input>
+        <input type="hidden" class="form-control" id="ms_Total"></input>
         <form class="form-horizontal">
+{% macro ms_input(id, type='text', class='form-control') -%}
           <div class="form-group">
-            <label class="control-label col-sm-2" for="ms_date">Date:</label>
-            <div class="col-sm-5"> <input type="text" class="datepicker form-control" id="ms_date"> </div>
-            <div class="col-sm-5"> <input type="text" class="datepicker form-control" id="ms_date2"> </div>
+            <label class="control-label col-sm-2" for="ms_{{id}}">{{id|capitalize}}:</label>
+            <div class="col-sm-5"> <input type="{{type}}" class="{{class}}" id="ms_{{id}}"></input> </div>
+            <div class="col-sm-5"> <input type="{{type}}" class="{{class}}" id="ms_{{id}}2"></input> </div>
           </div>
+{%- endmacro %}
+          {{ ms_input('date', class='datepicker form-control') }}
+          {{ ms_input('name') }}
           <div class="form-group">
-            <label class="control-label col-sm-2" for="ms_name">Name:</label>
-            <div class="col-sm-5"> <input type="text" class="form-control" id="ms_name"> </div>
-            <div class="col-sm-5"> <input type="text" class="form-control" id="ms_name2"> </div>
+            <label class="control-label col-sm-2" for="ms_Category">Category:</label>
+            <div class="col-sm-5"> <select class="form-control" id="ms_Category"></select> </div>
+            <div class="col-sm-5"> <select class="form-control" id="ms_Category2"></select> </div>
           </div>
-          <div class="form-group">
-            <label class="control-label col-sm-2" for="ms_category">Category:</label>
-            <div class="col-sm-5"> <select class="form-control" id="ms_category"></select> </div>
-            <div class="col-sm-5"> <select class="form-control" id="ms_category2"></select> </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-sm-2" for="ms_amount">Amount:</label>
-            <div class="col-sm-5"> <input type="text" class="form-control" id="ms_amount"> </div>
-            <div class="col-sm-5"> <input type="text" class="form-control" id="ms_amount2"> </div>
-          </div>
-          <div class="form-group">
-            <label class="control-label col-sm-2" for="ms_yearly">Yearly:</label>
-            <div class="col-sm-5"> <input type="checkbox" class="form-control" id="ms_yearly"> </div>
-            <div class="col-sm-5"> <input type="checkbox" class="form-control" id="ms_yearly2"> </div>
-          </div>
+          {{ ms_input('amount') }}
+          {{ ms_input('yearly', type='checkbox') }}
           <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
               <button type="button" id="ms_update" class="btn btn-default">Update</button>
@@ -107,6 +86,16 @@
     </div>
 
   </div>
+</div>
+
+<div id="row">
+  <form class="form-horizontal">
+    <div class="form-group">
+      <label class="control-label col-sm-1" for="ms_date">Filter:</label>
+      <div class="col-sm-5"> <input type="text" name="search" class="form-control"> </div>
+      <div class="col-sm-6"> </div>
+    </div>
+  </form>
 </div>
 
 <table id="transactions" class="table table-striped">
@@ -123,6 +112,7 @@
   <tbody> </tbody>
 </table>
 
+
 {% endblock %}
 
 
@@ -130,6 +120,7 @@
   {{super()}}
 <!--http://numeraljs.com/-->
 <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.4/numeral.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/fuse.js/2.5.0/fuse.min.js'></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="{{url_for('transaction.static', filename='js/categories.js')}}"></script>
 <script src="{{url_for('transaction.static', filename='js/transactions.js')}}"></script>
@@ -142,16 +133,21 @@ $(document).ready(function(){
   $.when(a1, a2).done(function(r1, r2) {
     categories = r1[0].categories;
     addCategoryOptions($("div.modal select"));
-    processTransactions(r2[0]);
+
+    init_transactions(
+      r2[0].transactions, r2[0].category_name, r2[0].months
+    );
   });
 
+  //init_editModal();
   $('button#me_update').click(function(){
     EditModal_update(
       "{{url_for('transaction.rest_update_transaction', category_id=category_id)}}"
     )
   });
-
   $('button#me_split').click(EditModal_split);
+
+  //init_splitModal();
   $('button#sm_update').click(function(){
     splitModal_update(
       "{{url_for('transaction.rest_split_transaction', category_id=category_id)}}"
@@ -159,7 +155,6 @@ $(document).ready(function(){
   });
   $('div#modalSplit input#ms_amount').change(splitModal_change);
   $('div#modalSplit input#ms_amount2').change(splitModal_change);
-
 });
 </script>
 {% endblock %}

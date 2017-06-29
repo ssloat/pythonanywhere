@@ -166,7 +166,6 @@ def transactions(category_id, from_date=None, to_date=None):
     ).order_by(Transaction.date.desc()).all()
 
     results = []
-    monthly = defaultdict(int)
     for tran in trans:
         results.append({
             'id': tran.id,
@@ -175,25 +174,21 @@ def transactions(category_id, from_date=None, to_date=None):
             'category_id': tran.category_id,
             'amount': tran.amount,
             'yearly': tran.yearly,
+            'yyyy/mm': tran.date.strftime('%Y/%m'),
         })
 
-        if not tran.yearly:
-            monthly[tran.date.strftime('%Y/%m')] += tran.amount
-
-    avg = float(sum(monthly.values())) / len(monthly.values())
     name = db.session.query(Category).filter(Category.id==category_id).first().name
 
-    monthly_data = [ ['Month', name, 'Average'] ]
-    start = datetime.date(trans[-1].date.year, trans[-1].date.month, 1)
-    stop = datetime.date(trans[0].date.year, trans[0].date.month, 1)
-    while stop >= start:
-        k = stop.strftime('%Y/%m')
-        monthly_data.append([k, abs(monthly.get(k, 0.0)), abs(avg)])
+    months = []
+    stop = trans[0].date.replace(day = 1)
+    while stop >= trans[-1].date.replace(day = 1):
+        months.append(stop.strftime('%Y/%m'))
         stop -= relativedelta(months=1)
 
     return {
         'transactions': results, 
-        'monthly_data': monthly_data,
+        'category_name': name,
+        'months': months,
     }
 
 
