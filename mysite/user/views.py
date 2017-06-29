@@ -1,6 +1,6 @@
 from mysite import db
 
-from mysite.user.models import User, ProviderId
+from mysite.user.models import User, create_user
 from mysite.user.oauth import OAuthSignIn
 
 from flask import Blueprint, render_template, redirect, url_for 
@@ -45,16 +45,7 @@ def oauth_callback(provider):
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        user = User(
-            first_name=first_name,
-            last_name=last_name,
-            name=' '.join([first_name, last_name]),
-            email=email
-        )
-        provider_id = ProviderId(id=social_id, user=user)
-        db.session.add(user)
-        db.session.add(provider_id)
-        db.session.commit()
+        user = create_user(social_id, first_name, last_name, email)
 
     login_user(user, True)
     return redirect(url_for('index'))
@@ -62,5 +53,8 @@ def oauth_callback(provider):
 @user_bp.route('/kona')
 def kona():
     user = User.query.filter_by(email='kona.pearl@gmail.com').first()
+    if not user:
+        user = create_user('google$kona.pearl', 'kona', 'pearl', 'kona.pearl@gmail.com')
+
     login_user(user, remember=True)
     return redirect(url_for('index'))

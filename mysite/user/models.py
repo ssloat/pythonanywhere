@@ -3,6 +3,7 @@ from mysite import db, lm
 from flask_login import UserMixin
 from sqlalchemy.ext.declarative import declared_attr
 
+from finances.models.category import Category
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -24,6 +25,26 @@ class ProviderId(db.Model):
     def __init__(self, id, user):
         self.id = id
         self.user = user
+
+def create_user(social_id, first_name, last_name, email):
+    user = User(
+        first_name=first_name,
+        last_name=last_name,
+        name=' '.join([first_name, last_name]),
+        email=email
+    )
+    provider_id = ProviderId(id=social_id, user=user)
+    db.session.add(user)
+    db.session.add(provider_id)
+
+    top = Category(user, 'top')
+    uncat = Category(user, 'uncategorized', top)
+    db.session.add(top)
+    db.session.add(uncat)
+
+    db.session.commit()
+    return user
+        
 
 class AddUser(object):
     
