@@ -21,10 +21,9 @@ def main():
         run(start, end)
 
 def run(start, end):
-        
-    assets = db.session.query(Asset).all()
-    for asset in assets:
-        with requests.Session() as s:
+    with requests.Session() as s:
+        assets = db.session.query(Asset).all()
+        for asset in assets:
             query(s, asset, start, end)
 
 def query(s, asset, start, end):
@@ -61,6 +60,9 @@ def query(s, asset, start, end):
     volumes = quotes['volume']
 
     for ts, o, h, l, c, v in zip(timestamps, opens, highs, lows, closes, volumes):
+        if c is None:
+            continue
+
         date = datetime.datetime.fromtimestamp(ts).date()
         #print ts, date, o, h, l, c, v
 
