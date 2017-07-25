@@ -46,6 +46,18 @@ class Asset(db.Model):
         )
         return prices[-1].close if prices else self.prices[-1]
 
+    def return_(self, start, end):
+        one = self.price(start)
+        two = self.price(end)
+
+        if one is None:
+            print "No price for %s" % str(start)
+
+        if two is None:
+            print "No price for %s" % str(end)
+
+        return float(two - one) / one
+
 """
 create view asset_prices as
 select concat('STOCK-', sp.id) as id, s.ticker as ticker, sp.date as date, sp.close as close,
