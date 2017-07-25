@@ -1,6 +1,7 @@
 from mysite import db
 
-from mysite.user.models import User, create_user
+from mysite.user.models import User
+from mysite.user.create import create_user
 from mysite.user.oauth import OAuthSignIn
 
 from flask import Blueprint, render_template, redirect, url_for 
