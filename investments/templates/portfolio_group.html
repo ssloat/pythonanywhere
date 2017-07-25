@@ -51,7 +51,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for row in results %}
+    {% for row in results|reverse %}
     <tr> {% for elem in row %}<td>{{elem|money}}</td>{% endfor %} </tr>
     {% endfor %}
   </tbody>
