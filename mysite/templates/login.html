@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block mainpane %}
+    {% if current_user.is_authenticated %}
+        <h2>Hi, {{ current_user.name }}!</h2>
+        <p><a href="{{ url_for('user.logout') }}">Logout</a></p>
+    {% else %}
+        <h2>Please Sign In</h2>
+        <p><a href="{{ url_for('user.oauth_authorize', provider='facebook') }}">Login with Facebook</a></p>
+        <p><a href="{{ url_for('user.oauth_authorize', provider='google') }}">Login with Google</a></p>
+    {% endif %}
+{% endblock %}
+
