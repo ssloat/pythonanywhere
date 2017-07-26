@@ -1,7 +1,7 @@
 import re
 from mysite import db
 
-from mysite.user.models import AddUser
+from mysite.models.user import AddUser
 from finances.models.category import Category
 from finances.models.record import Record
 

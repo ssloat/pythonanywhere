@@ -1,5 +1,5 @@
 from mysite import db
-from mysite.user.models import AddUser
+from mysite.models.user import AddUser
 from finances.models.category import Category, allChildren
 from finances.models.record import Record
 from finances.models.pattern import Pattern
