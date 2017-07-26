@@ -3,7 +3,7 @@ import logging
 from flask_testing import TestCase
 
 from mysite import create_app, db
-from mysite.user.models import User
+from mysite.models.user import User
 
 class TestBase(TestCase):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'

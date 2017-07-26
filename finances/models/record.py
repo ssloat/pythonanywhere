@@ -1,5 +1,5 @@
 from mysite import db
-from mysite.user.models import AddUser
+from mysite.models.user import AddUser
 
 
 class Record(db.Model, AddUser):
