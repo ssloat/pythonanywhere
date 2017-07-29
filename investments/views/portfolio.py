@@ -7,7 +7,7 @@ import itertools
 from dateutil.relativedelta import relativedelta
 
 from investments.models.portfolio import PortfolioGroup, Portfolio, Position
-from investments.models.assets import Asset
+from investments.models.assets import Asset, AssetPrice
 from mysite import db
 
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for
@@ -139,5 +139,29 @@ def interval_investing(ticker, amount, start):
 
     return render_template('interval_investing.html', results=results, table=table)
 
+@portfolio_bp.route('/prices/<date>')
+def prices(date):
+    date = datetime.date(*[int(x) for x in date.split('-')])
 
+    def price(ticker):
+        ap = db.session.query(AssetPrice).filter(
+            AssetPrice.ticker==ticker,
+            AssetPrice.date==date,
+        ).all()
+
+        if ap:
+            return "%.2f" % ap[0].close
+
+
+    results = [
+        'BAC', 'AAPL', 'AET', 'HD', 'AMZN', 'BA', 'EA', None,
+        'VFINX', 'VOO', 'VIIIX', None,
+        'LMBMX', 'VEXAX', None, 'OSMAX', 'TFEQX', None, 'WACSX', None,
+        'VGSIX', 'VNQ', None, None, None,
+        'VDE', 'VGPMX', 'VHT', 'VNQ', None,
+        'DXJS', 'INCO', 'FEMS', 'FEP', 'DFE', 'FPA',
+    ]
+
+    results = [price(t) if t else None for t in results]
+    return render_template('prices.html', results=results)
     
